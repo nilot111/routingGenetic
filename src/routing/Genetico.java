@@ -14,8 +14,8 @@ import java.util.Random;
  * @author GUERRA
  */
 public class Genetico {
-    private int maxPoblacion = 200; // maximo numero de soluciones posibles
-    private int maxGeneraciones=4; // maxiteraciones
+    private int maxPoblacion = 400; // maximo numero de soluciones posibles
+    private int maxGeneraciones=10; // maxiteraciones
     private double probMutacion=0.01;
     private int consumoBase=20;
     private int consumoLleno=25;
@@ -84,6 +84,14 @@ public class Genetico {
                 hijo= crossover(padre,madre);
                 //hijo.print();
                 abominacion=verificar(hijo);
+                if(!abominacion){ // comprobar que hijo es mejor que padres
+                    ArrayList<Integer> solucionPura=limpiarCromosoma(hijo); // quitar almacenes no usados de la solucion
+                    ArrayList<Integer> solucionPuraPadre=limpiarCromosoma(padre); 
+                    ArrayList<Integer> solucionPuraMadre=limpiarCromosoma(madre); 
+                    if(costoSolucion(solucionPura)>costoSolucion(solucionPuraPadre) &&
+                            costoSolucion(solucionPura)>costoSolucion(solucionPuraMadre))
+                        abominacion=true; // si es peor q padre y madre sigue siendo abominacion
+                }
                 //System.out.println("intento "+n);
                 n++;
             }
