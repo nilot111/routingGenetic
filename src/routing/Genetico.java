@@ -14,8 +14,8 @@ import java.util.Random;
  * @author GUERRA
  */
 public class Genetico {
-    private int maxPoblacion = 100; // maximo numero de soluciones posibles
-    private int maxGeneraciones=30; // maxiteraciones
+    private int maxPoblacion = 200; // maximo numero de soluciones posibles
+    private int maxGeneraciones=4; // maxiteraciones
     private double probMutacion=0.01;
     private int consumoBase=20;
     private int consumoLleno=25;
@@ -47,37 +47,52 @@ public class Genetico {
         inicializarNodos(clientes); // se juntan tanto clientes como depositos
         inicializarPoblacion();
         ArrayList<Cromosoma> poblacionNueva= new ArrayList<>(poblacion);
-        for(int i=0;i<1;i++){
+      
+        for(int i=0;i<maxGeneraciones;i++){
             double fitnessPromedio=evaluar(poblacionNueva);
-            System.out.println(fitnessPromedio);
+            System.out.println("fitness promedio generacion "+i+" : "+fitnessPromedio);
             reproduccion(poblacionNueva,fitnessPromedio);
         }
     }
     
     public void reproduccion(ArrayList<Cromosoma> poblacion,double fitnessPromedio){
         int fitnessTotal=(int) Math.round(fitnessPromedio*poblacion.size());
-        System.out.println(fitnessTotal);
+        //System.out.println(fitnessTotal);
+        ArrayList<Cromosoma> offspring= new ArrayList<>();
         for(Cromosoma solucion :poblacion){
-            Random semilla = new Random(); // seleccionar padre
-            Random semilla2 = new Random();// seleccionar madre
-            int pospadre=semilla.nextInt(fitnessTotal);
-            int posmadre=semilla2.nextInt(fitnessTotal);
-            int encPadre=0,encMadre=0,sumafit=0; // simulamos ruleta de selecciones de padres
-            while(sumafit<=pospadre){
-                sumafit+=poblacion.get(encPadre++).fitness;
-            }
-            sumafit=0;
-            while(sumafit<=posmadre){
-                sumafit+=poblacion.get(encMadre++).fitness;
-            }
             boolean abominacion=true;
             Cromosoma hijo=null;
+            int n=0;
             while(abominacion) { // seguir haciendo crossover hasta obtener una solución factible
-                hijo= crossover(poblacion.get(--encPadre),poblacion.get(--encMadre));
+                Random semilla = new Random(); // seleccionar padre
+                Random semilla2 = new Random();// seleccionar madre
+                int pospadre=semilla.nextInt(fitnessTotal);
+                int posmadre=semilla2.nextInt(fitnessTotal);
+                //System.out.println(pospadre);
+                int encPadre=0,encMadre=0,sumafit=0; // simulamos ruleta de selecciones de padres
+                while(sumafit<=pospadre){
+                    sumafit+=poblacion.get(encPadre++).fitness;
+                }
+                sumafit=0;
+                while(sumafit<=posmadre){
+                    sumafit+=poblacion.get(encMadre++).fitness;
+                }         
+                encPadre--;
+                encMadre--;
+                Cromosoma padre=poblacion.get(encPadre);
+                Cromosoma madre=poblacion.get(encMadre);                
+                hijo= crossover(padre,madre);
+                //hijo.print();
                 abominacion=verificar(hijo);
+                //System.out.println("intento "+n);
+                n++;
             }
             if(Math.random()<=probMutacion) mutacion(hijo); // solo si da dentro de la probabilidad de mutar, muta
-            //mutacion(hijo);            
+            offspring.add(hijo);
+        }
+        //copiar nueva  generacion a poblacion
+        for(int i=0;i<offspring.size();i++){
+            poblacion.set(i, offspring.get(i));
         }
     }
     
@@ -107,11 +122,13 @@ public class Genetico {
             posIni=posFin;
             posFin=aux;
         }
+        
         for(int i=0;i<numNodos;i++){
             if(i<posIni || i>posFin) {
                 hijo.genes.set(i,padre.genes.get(i));
             } //hereda del padre
         }
+
         return hijo;
     }
     
@@ -179,7 +196,8 @@ public class Genetico {
                 Collections.shuffle(origen.genes); // generar solución aleatoria
                 factible=verificar(origen); //verificar si es factible
             }
-            poblacion.add(origen); // agregamos solución a la poblacion
+            Cromosoma nuevaSolucion=new Cromosoma(origen);
+            poblacion.add(nuevaSolucion); // agregamos solución a la poblacion
 //            ArrayList<Integer> limpio=limpiarCromosoma(origen);
 //            origen.print();
 //            for(int i=0;i<limpio.size();i++)
@@ -187,7 +205,7 @@ public class Genetico {
 //            System.out.println();
 //            System.out.println(costoSolucion(limpio));
             //origen.print();
-        }
+        }        
     }
     public boolean verificar(Cromosoma solucion){
         ArrayList<Integer> genes=solucion.genes;
