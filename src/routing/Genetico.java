@@ -14,8 +14,8 @@ import java.util.Random;
  * @author GUERRA
  */
 public class Genetico {
-    private int maxPoblacion = 400; // maximo numero de soluciones posibles
-    private int maxGeneraciones=10; // maxiteraciones
+    private int maxPoblacion = 100; // maximo numero de soluciones posibles
+    private int maxGeneraciones=5; // maxiteraciones
     private double probMutacion=0.01;
     private int consumoBase=20;
     private int consumoLleno=25;
@@ -53,15 +53,39 @@ public class Genetico {
             System.out.println("fitness promedio generacion "+i+" : "+fitnessPromedio);
             reproduccion(poblacionNueva,fitnessPromedio);
         }
+//        Cromosoma hijo= crossover(poblacionNueva.get(10),poblacionNueva.get(15));
+        Cromosoma mejorSolucion=obtenerMejor(poblacionNueva);
+//        mejorSolucion.print();
+//        ArrayList<ArrayList<Integer>> arr= obtenerRutas(mejorSolucion);
+//        for(int i=0;i<arr.size();i++){
+//            for(int j=0;j<arr.get(i).size();j++){
+//                System.out.print(arr.get(i).get(j)+"-");
+//            }
+//            System.out.println();
+//        }
+//        imprimeRecorrido(poblacionNueva.get(10));
+//        imprimeRecorrido(poblacionNueva.get(15));
+        imprimeRecorrido(mejorSolucion);
     }
     
+    public Cromosoma  obtenerMejor(ArrayList<Cromosoma> poblacion){
+        double fitMax=0;
+        int imax=0;
+        for(int i=0;i<poblacion.size();i++){
+            if(poblacion.get(i).fitness>fitMax) {
+                fitMax=poblacion.get(i).fitness;
+                imax=i;
+            }
+        }
+        return poblacion.get(imax);
+    }
     public void reproduccion(ArrayList<Cromosoma> poblacion,double fitnessPromedio){
         int fitnessTotal=(int) Math.round(fitnessPromedio*poblacion.size());
         //System.out.println(fitnessTotal);
         ArrayList<Cromosoma> offspring= new ArrayList<>();
         for(Cromosoma solucion :poblacion){
             boolean abominacion=true;
-            Cromosoma hijo=null;
+            Cromosoma hijo=new Cromosoma();
             int n=0;
             while(abominacion) { // seguir haciendo crossover hasta obtener una solución factible
                 Random semilla = new Random(); // seleccionar padre
@@ -83,15 +107,14 @@ public class Genetico {
                 Cromosoma madre=poblacion.get(encMadre);                
                 hijo= crossover(padre,madre);
                 //hijo.print();
+                
                 abominacion=verificar(hijo);
                 if(!abominacion){ // comprobar que hijo es mejor que padres
-                    ArrayList<Integer> solucionPura=limpiarCromosoma(hijo); // quitar almacenes no usados de la solucion
-                    ArrayList<Integer> solucionPuraPadre=limpiarCromosoma(padre); 
-                    ArrayList<Integer> solucionPuraMadre=limpiarCromosoma(madre); 
-                    if(costoSolucion(solucionPura)>costoSolucion(solucionPuraPadre) &&
-                            costoSolucion(solucionPura)>costoSolucion(solucionPuraMadre))
+                    if(costoSolucion(hijo.genes)>costoSolucion(padre.genes) &&
+                            costoSolucion(hijo.genes)>costoSolucion(madre.genes))
                         abominacion=true; // si es peor q padre y madre sigue siendo abominacion
                 }
+                imprimeRecorrido(hijo);
                 //System.out.println("intento "+n);
                 n++;
             }
@@ -107,8 +130,8 @@ public class Genetico {
     public void mutacion(Cromosoma hijo){
         Random clientRandom1 = new Random();
         Random clientRandom2 = new Random();
-        int clien1 = clientRandom1.nextInt(nodos.size());
-        int clien2 = clientRandom2.nextInt(nodos.size());
+        int clien1 = clientRandom1.nextInt(hijo.genes.size());
+        int clien2 = clientRandom2.nextInt(hijo.genes.size());
         if(hijo.genes.get(clien1)<nclientes && hijo.genes.get(clien2)<nclientes){
             int auxclien1=hijo.genes.get(clien1);
             int auxclien2=hijo.genes.get(clien2);
@@ -121,36 +144,63 @@ public class Genetico {
         }
     }
     public Cromosoma crossover(Cromosoma padre, Cromosoma madre){
-        Cromosoma hijo=new Cromosoma(madre); // inicializo con la madre
-        int numNodos=nodos.size();
-        int posIni = (int) (Math.random() * numNodos);
-        int aux=posIni;
-        int posFin = (int) (Math.random() * numNodos);
-        if(posIni>posFin){
-            posIni=posFin;
-            posFin=aux;
-        }
-        
-        for(int i=0;i<numNodos;i++){
-            if(i<posIni || i>posFin) {
-                hijo.genes.set(i,padre.genes.get(i));
-            } //hereda del padre
-        }
-
+        Cromosoma hijo=new Cromosoma(); // inicializo con la madre
+        ArrayList<ArrayList<Integer>> rutasPadre= obtenerRutas(padre);
+        ArrayList<ArrayList<Integer>> rutasMadre= obtenerRutas(madre);
+        Random ran=new Random();
+        ArrayList<Integer> rutaRandom=rutasMadre.get(ran.nextInt(rutasMadre.size())); // obtengo ruta random de madre
+        ArrayList<Integer> genes=(ArrayList<Integer>)padre.genes.clone();
+        for(int i=1;i<rutaRandom.size();i++){ // elimino los clientes
+            genes.remove(genes.indexOf(rutaRandom.get(i)));
+        }     
+        for(int j=1;j<rutaRandom.size();j++){ //inserto evluando costos desde 1 porq 0 es el almacen
+            double costoMin=10000000;
+            int indMin=0;
+            for(int h=1;h<genes.size();h++){ // el primer gen no puede ser un cliente
+                genes.add(h,rutaRandom.get(j));
+                if(verificarGenes(genes)){ // si es factible
+                    double costo=costoSolucion(genes);
+                    if(costo<costoMin){
+                        costoMin=costo;
+                        indMin=h;
+                    }
+                    
+                }
+                genes.remove(h);
+            }
+            genes.add(indMin,rutaRandom.get(j));
+        }          
+        hijo.genes=(ArrayList<Integer>)genes.clone();
         return hijo;
     }
     
+    public ArrayList<ArrayList<Integer>> obtenerRutas(Cromosoma sol){
+        ArrayList<Integer>solPura=limpiarCromosoma(sol);
+        ArrayList<ArrayList<Integer>> rutas= new ArrayList<>();
+        int i=0;
+        ArrayList<Integer> ruta= new ArrayList<>();
+        while(i<solPura.size()){
+            if(solPura.get(i)>=nclientes && i>0) {
+                rutas.add(ruta);
+                ruta= new ArrayList<>();  
+                ruta.add(solPura.get(i));
+            }
+            else ruta.add(solPura.get(i));
+            i++;
+        }
+        rutas.add(ruta);
+        return rutas;
+    }
     public double evaluar(ArrayList<Cromosoma> poblacion){
         int fitnessTotal=0;
         double costoMax=0;
         for (Cromosoma solucion : poblacion) { // considerando solo un tipo de producto
-            ArrayList<Integer> solucionPura=limpiarCromosoma(solucion); // quitar almacenes no usados de la solucion
-            double costo=costoSolucion(solucionPura);
+            double costo=costoSolucion(solucion.genes);
             if(costo>costoMax) costoMax=costo;
             solucion.fitness=costo;
         }
         for(Cromosoma solucion : poblacion) {
-            solucion.fitness=costoMax-solucion.fitness; // debido a que se escogera según su fitness , invertimos costo
+            solucion.fitness=50000-solucion.fitness; // debido a que se escogera según su fitness , invertimos costo
             fitnessTotal+=solucion.fitness;
         }
         //System.out.println(fitnessTotal);
@@ -205,6 +255,8 @@ public class Genetico {
                 factible=verificar(origen); //verificar si es factible
             }
             Cromosoma nuevaSolucion=new Cromosoma(origen);
+            ArrayList<Integer> genes= limpiarCromosoma(nuevaSolucion);
+            nuevaSolucion.genes=(ArrayList<Integer>)genes.clone();
             poblacion.add(nuevaSolucion); // agregamos solución a la poblacion
 //            ArrayList<Integer> limpio=limpiarCromosoma(origen);
 //            origen.print();
@@ -232,5 +284,37 @@ public class Genetico {
             }
         }
         return true;
+    }
+    public boolean verificarGenes( ArrayList<Integer> genes){
+        if(genes.get(0)<nclientes) return false; // si comienza por cliente no va
+        else{
+            int i=1;
+            while(i<genes.size()){ // mientras recorra todo el arreglo
+                while(i<genes.size() && genes.get(i)>=nclientes ) i++; // Avanzar hasta encontrar un cliente o terminar arreglo
+                int carga=0; // Inicializar carga cuando haya un almacen
+                if(i>=genes.size()) continue;
+                while(i<genes.size() && genes.get(i)<nclientes ){ // mientras sean clientes aumentar carga
+                    carga+=nodos.get(genes.get(i)).getDemanda();
+                    i++;
+                    if(carga>capvehiculo) return false;
+                }
+            }
+        }
+        return true;
+    }    
+    
+    public void imprimeRecorrido(Cromosoma sol){
+
+        for(int i=0;i<sol.genes.size();i++){
+            if(sol.genes.get(i)>=nclientes){ // si es un almacen
+                if(i>0) System.out.print("->T");// marcar fin de ruta
+                int nAlmacen=(sol.genes.get(i)-nclientes)%maxUsosAlmacen; // determinamos el almacen
+                System.out.print("//T->A"+nAlmacen);
+            }
+            else{ // si es cliente
+                 System.out.print("->"+sol.genes.get(i));
+            }
+        }
+        System.out.println();
     }
 }

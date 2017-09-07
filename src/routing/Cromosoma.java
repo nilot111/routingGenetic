@@ -13,7 +13,7 @@ import java.util.ArrayList;
  */
 public class Cromosoma {
     public ArrayList<Integer> genes ;
-    public double fitness; 
+    public double fitness;
     
     public void print(){
         for(int i=0;i<genes.size();i++)
@@ -28,4 +28,5 @@ public class Cromosoma {
         this.genes=new ArrayList<>(copia.genes);
         this.fitness=copia.fitness;
     }
+
 }
