@@ -14,8 +14,8 @@ import java.util.Random;
  * @author GUERRA
  */
 public class Genetico {
-    private int maxPoblacion = 100; // maximo numero de soluciones posibles
-    private int maxGeneraciones=5; // maxiteraciones
+    private int maxPoblacion = 200; // maximo numero de soluciones posibles
+    private int maxGeneraciones=30; // maxiteraciones
     private double probMutacion=0.01;
     private int consumoBase=20;
     private int consumoLleno=25;
@@ -23,6 +23,7 @@ public class Genetico {
     private int numVehiculos=3;
     private int maxUsosAlmacen=3;
     private int nclientes=0;
+    private int MAXFIT=30000;
     public ArrayList<Cromosoma> poblacion= new ArrayList<>();
     public ArrayList<Cliente> almacenes = new ArrayList<>();
     public ArrayList<Cliente> nodos; // aqui se incluyen tanto clientes como Almacenes
@@ -47,11 +48,12 @@ public class Genetico {
         inicializarNodos(clientes); // se juntan tanto clientes como depositos
         inicializarPoblacion();
         ArrayList<Cromosoma> poblacionNueva= new ArrayList<>(poblacion);
-      
-        for(int i=0;i<maxGeneraciones;i++){
-            double fitnessPromedio=evaluar(poblacionNueva);
+        double fitnessPromedio=0;
+        for(int i=0;i<=maxGeneraciones;i++){
+            fitnessPromedio=evaluar(poblacionNueva);
+            if(i==maxGeneraciones) break;
             System.out.println("fitness promedio generacion "+i+" : "+fitnessPromedio);
-            reproduccion(poblacionNueva,fitnessPromedio);
+            reproduccion(poblacionNueva,fitnessPromedio);    
         }
 //        Cromosoma hijo= crossover(poblacionNueva.get(10),poblacionNueva.get(15));
         Cromosoma mejorSolucion=obtenerMejor(poblacionNueva);
@@ -66,6 +68,7 @@ public class Genetico {
 //        imprimeRecorrido(poblacionNueva.get(10));
 //        imprimeRecorrido(poblacionNueva.get(15));
         imprimeRecorrido(mejorSolucion);
+        System.out.println(mejorSolucion.fitness);
     }
     
     public Cromosoma  obtenerMejor(ArrayList<Cromosoma> poblacion){
@@ -108,13 +111,13 @@ public class Genetico {
                 hijo= crossover(padre,madre);
                 //hijo.print();
                 
-                abominacion=verificar(hijo);
-                if(!abominacion){ // comprobar que hijo es mejor que padres
-                    if(costoSolucion(hijo.genes)>costoSolucion(padre.genes) &&
-                            costoSolucion(hijo.genes)>costoSolucion(madre.genes))
-                        abominacion=true; // si es peor q padre y madre sigue siendo abominacion
-                }
-                imprimeRecorrido(hijo);
+                abominacion=!verificar(hijo);
+//                if(!abominacion){ // comprobar que hijo es mejor que padres
+//                    if(costoSolucion(hijo.genes)>costoSolucion(padre.genes) &&
+//                            costoSolucion(hijo.genes)>costoSolucion(madre.genes))
+//                        abominacion=true; // si es peor q padre y madre sigue siendo abominacion
+//                }
+                //imprimeRecorrido(hijo);
                 //System.out.println("intento "+n);
                 n++;
             }
@@ -171,6 +174,7 @@ public class Genetico {
             genes.add(indMin,rutaRandom.get(j));
         }          
         hijo.genes=(ArrayList<Integer>)genes.clone();
+        hijo.genes=limpiarCromosoma(hijo);
         return hijo;
     }
     
@@ -193,14 +197,9 @@ public class Genetico {
     }
     public double evaluar(ArrayList<Cromosoma> poblacion){
         int fitnessTotal=0;
-        double costoMax=0;
-        for (Cromosoma solucion : poblacion) { // considerando solo un tipo de producto
-            double costo=costoSolucion(solucion.genes);
-            if(costo>costoMax) costoMax=costo;
-            solucion.fitness=costo;
-        }
+
         for(Cromosoma solucion : poblacion) {
-            solucion.fitness=50000-solucion.fitness; // debido a que se escogera según su fitness , invertimos costo
+            solucion.fitness=MAXFIT-costoSolucion(solucion.genes); // debido a que se escogera según su fitness , invertimos costo
             fitnessTotal+=solucion.fitness;
         }
         //System.out.println(fitnessTotal);
@@ -238,8 +237,8 @@ public class Genetico {
         ArrayList<Integer> limpio= new ArrayList<>();
         int tamArreglo=sol.genes.size();
         for(int i=1;i<tamArreglo;i++){
-            if(sol.genes.get(i-1)>=nclientes && sol.genes.get(i)>=nclientes) continue; // no se consideraran almacenes contiguos, en caso de este solo se considerará el ultimo
-            limpio.add(sol.genes.get(i-1)); // solo se consideran clientes y almacenes anteriores a clientes
+            if(sol.genes.get(i-1)>=nclientes && sol.genes.get(i)>=nclientes) ; // no se consideraran almacenes contiguos, en caso de este solo se considerará el ultimo
+            else limpio.add(sol.genes.get(i-1)); // solo se consideran clientes y almacenes anteriores a clientes
         }
         if(sol.genes.get(tamArreglo-1)<nclientes) limpio.add(sol.genes.get(tamArreglo-1)); // si el ultimo es cliente se agrega
         return limpio;
@@ -315,6 +314,6 @@ public class Genetico {
                  System.out.print("->"+sol.genes.get(i));
             }
         }
-        System.out.println();
+        System.out.println("->T");
     }
 }
