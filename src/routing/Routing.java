@@ -32,7 +32,9 @@ public class Routing {
         clientes.add(new Cliente(86,31,1)); // cliente 9
         //clientes.get(0).print();
         Genetico genAlgoritmo= new Genetico();
+        Memetico memAlgoritmo= new Memetico();
         genAlgoritmo.ejecutar(clientes);
+        memAlgoritmo.ejecutar(clientes);
     }
 
 }

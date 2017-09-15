@@ -13,7 +13,7 @@ import java.util.Random;
  *
  * @author GUERRA
  */
-public class Genetico {
+public class Memetico {
     private int maxPoblacion = 200; // maximo numero de soluciones posibles
     private int maxGeneraciones=30; // maxiteraciones
     private double probMutacion=0.01;
@@ -24,11 +24,14 @@ public class Genetico {
     private int maxUsosAlmacen=3;
     private int nclientes=0;
     private int MAXFIT=30000;
+    private double porcConvergencia=0.98;
+    private double porcPreservacion=0.6;
+    private int maxIntentos=5;
     public ArrayList<Cromosoma> poblacion= new ArrayList<>();
     public ArrayList<Cliente> almacenes = new ArrayList<>();
     public ArrayList<Cliente> nodos; // aqui se incluyen tanto clientes como Almacenes
     public Cliente terminal= new Cliente(0,0,0); // terminal de buses donde todos parten y vuelven
-    Genetico(){
+    Memetico(){
         almacenes.add(new Cliente(10,10,0));
         almacenes.add(new Cliente(25,10,0));
         almacenes.add(new Cliente(50,10,0));
@@ -48,13 +51,25 @@ public class Genetico {
         inicializarNodos(clientes); // se juntan tanto clientes como depositos
         inicializarPoblacion();
         ArrayList<Cromosoma> poblacionNueva= new ArrayList<>(poblacion);
+        double fitnessAnterior=0;
         double fitnessPromedio=0;
         for(int i=0;i<=maxGeneraciones;i++){
             fitnessPromedio=evaluar(poblacionNueva);
             if(i==maxGeneraciones) break;
+            if(fitnessAnterior/fitnessPromedio>porcConvergencia){
+                reiniciarPoblacion(poblacionNueva);
+                fitnessPromedio=evaluar(poblacionNueva);
+            }
             //System.out.println("fitness promedio generacion "+i+" : "+fitnessPromedio);
-            reproduccion(poblacionNueva,fitnessPromedio);    
+            reproduccion(poblacionNueva,fitnessPromedio);
+            fitnessAnterior=fitnessPromedio;
         }
+//        Cromosoma prueba=busquedaLocal(poblacion.get(0));
+//        imprimeRecorrido(poblacion.get(0));
+//        imprimeRecorrido(prueba);
+//        System.out.println(poblacion.get(0).fitness);
+//        System.out.println(prueba.fitness);
+        
 //        Cromosoma hijo= crossover(poblacionNueva.get(10),poblacionNueva.get(15));
         Cromosoma mejorSolucion=obtenerMejor(poblacionNueva);
 //        mejorSolucion.print();
@@ -67,10 +82,24 @@ public class Genetico {
 //        }
 //        imprimeRecorrido(poblacionNueva.get(10));
 //        imprimeRecorrido(poblacionNueva.get(15));
+
         imprimeRecorrido(mejorSolucion);
         System.out.println(mejorSolucion.fitness);
     }
     
+    public void reiniciarPoblacion(ArrayList<Cromosoma> poblacion){
+        int nroPreservados=(int) (poblacion.size()*porcPreservacion);
+        for(int i=nroPreservados;i<poblacion.size();i++){ // alteramos
+            boolean abominacion=true;
+            Cromosoma ind=poblacion.get(i);
+            while(abominacion){
+                Collections.shuffle(ind.genes);
+                abominacion=!verificar(ind);
+            }
+            Cromosoma mejorado=busquedaLocal(ind);
+            poblacion.set(i, mejorado);
+        }
+    }
     public Cromosoma  obtenerMejor(ArrayList<Cromosoma> poblacion){
         double fitMax=0;
         int imax=0;
@@ -257,7 +286,8 @@ public class Genetico {
             Cromosoma nuevaSolucion=new Cromosoma(origen);
             ArrayList<Integer> genes= limpiarCromosoma(nuevaSolucion);
             nuevaSolucion.genes=(ArrayList<Integer>)genes.clone();
-            poblacion.add(nuevaSolucion); // agregamos solución a la poblacion
+            Cromosoma optimizada= busquedaLocal(nuevaSolucion);
+            poblacion.add(optimizada); // agregamos solución a la poblacion
 //            ArrayList<Integer> limpio=limpiarCromosoma(origen);
 //            origen.print();
 //            for(int i=0;i<limpio.size();i++)
@@ -267,6 +297,68 @@ public class Genetico {
             //origen.print();
         }        
     }
+    
+    public Cromosoma busquedaLocal(Cromosoma individuo){
+        Cromosoma mejorado= new Cromosoma(individuo);
+        int intentosExt=0;
+        double mejorFitness=MAXFIT-costoSolucion(individuo.genes);
+        ArrayList<ArrayList<Integer>> rutas=obtenerRutas(individuo);
+        ArrayList<Integer> randoms =new ArrayList<>();
+        for(int i=0;i<rutas.size();i++) randoms.add(i);
+        while(intentosExt<maxIntentos){
+            Collections.shuffle(randoms);
+            ArrayList<Integer> ruta1=rutas.get(randoms.get(0));
+            ArrayList<Integer> ruta2=rutas.get(randoms.get(rutas.size()-1));
+            boolean mejora=false;
+            int minDemanda1=0,maxDemanda1=0,totalDemanda1=0,minDemanda2=0,maxDemanda2=0,totalDemanda2=0;
+            totalDemanda1=demandaRuta(ruta1,minDemanda1,maxDemanda1);
+            totalDemanda2=demandaRuta(ruta2,minDemanda2,maxDemanda2);           
+            if(minDemanda1-maxDemanda2+totalDemanda2<=capvehiculo && 
+                    minDemanda2-maxDemanda1+totalDemanda1<=capvehiculo){
+                int intentosInt=0;
+                while(intentosInt<maxIntentos){
+                    Random rand= new Random();
+                    Random rand2= new Random();
+                    int indcliente1=individuo.genes.indexOf(ruta1.get(rand.nextInt(ruta1.size()-1)+1));// para que no coja el primero(alamcen)
+                    int indcliente2=individuo.genes.indexOf(ruta2.get(rand2.nextInt(ruta2.size()-1)+1));// para que no coja el primero(alamcen)
+                    Collections.swap(individuo.genes,indcliente1,indcliente2);// intercambiamos
+                    double fitness=MAXFIT-costoSolucion(individuo.genes);
+                    if(fitness>mejorFitness && verificar(individuo)){
+                        mejorFitness=fitness;
+                        mejorado.genes=(ArrayList<Integer>)individuo.genes.clone();
+                        mejorado.fitness=mejorFitness;
+                        intentosInt=0;
+                        mejora=true;
+                    }
+                    else intentosInt++;
+                }
+            }
+            if(mejora) intentosExt=0;
+            else intentosExt++;
+        }
+        return mejorado;
+    }
+    
+    
+    public int demandaRuta(ArrayList<Integer> ruta,int minDemanda,int maxDemanda){
+        int max=0;
+        int min=10000;
+        int total=0;
+        int carga=0;
+        for(int i=0;i<ruta.size();i++){
+            if(ruta.get(i)>=nclientes || i==ruta.size()-1){ // si es centro o es el último
+                if(carga>max) max=carga;
+                if(carga<min) min=carga;
+                total+=carga;
+                carga=0;
+            }
+            else carga+=nodos.get(ruta.get(i)).getDemanda();
+        }
+        minDemanda=min;
+        maxDemanda=max;
+        return total;
+    }   
+    
     public boolean verificar(Cromosoma solucion){
         ArrayList<Integer> genes=solucion.genes;
         if(genes.get(0)<nclientes) return false; // si comienza por cliente no va
