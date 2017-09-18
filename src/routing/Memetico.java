@@ -51,6 +51,7 @@ public class Memetico {
         this.capvehiculo=capV;
         this.porcConvergencia=(double)porcCon/100;
         this.porcPreservacion=(double)porcPre/100;
+        this.MAXFIT=clientes.size()*22000;
     }    
     public void inicializarNodos(ArrayList<Cliente> clientes){
         nodos=new ArrayList<>(clientes);

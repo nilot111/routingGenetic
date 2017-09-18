@@ -19,6 +19,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.paint.Color;
 import javax.swing.JFileChooser;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -83,6 +85,23 @@ public class Interface extends javax.swing.JFrame {
         maxPoblacion = new javax.swing.JSpinner();
         porcMutacion = new javax.swing.JSpinner();
         maxGeneraciones = new javax.swing.JSpinner();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        rutas_gen = new javax.swing.JTextArea();
+        jLabel16 = new javax.swing.JLabel();
+        jLabel17 = new javax.swing.JLabel();
+        gen_costo = new javax.swing.JTextField();
+        gen_fit = new javax.swing.JTextField();
+        jLabel18 = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        rutas_mem = new javax.swing.JTextArea();
+        jLabel19 = new javax.swing.JLabel();
+        jLabel20 = new javax.swing.JLabel();
+        mem_costo = new javax.swing.JTextField();
+        mem_fit = new javax.swing.JTextField();
         panel_genetico = new javax.swing.JPanel();
         panel_memetico = new javax.swing.JPanel();
 
@@ -90,7 +109,10 @@ public class Interface extends javax.swing.JFrame {
         setSize(new java.awt.Dimension(1200, 1200));
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        panel_configuración.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
         jLabel4.setText("Ruta de archivo:");
+        panel_configuración.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 29, -1, -1));
 
         jButton1.setText("Explorar");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -98,40 +120,57 @@ public class Interface extends javax.swing.JFrame {
                 jButton1ActionPerformed(evt);
             }
         });
+        panel_configuración.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(547, 25, -1, -1));
 
         text_clientes.setText("C:\\Users\\GUERRA\\Desktop\\Tesis 2\\Data\\p01.txt");
+        panel_configuración.add(text_clientes, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 26, 437, -1));
 
         jLabel6.setText("Consumo de combustible base:");
+        panel_configuración.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(79, 102, -1, -1));
 
         consumoBase.setValue(20);
+        panel_configuración.add(consumoBase, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 99, 60, -1));
 
         jLabel7.setText("Consumo de combustible máximo:");
+        panel_configuración.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(66, 128, -1, -1));
 
         consumoMax.setValue(35);
+        panel_configuración.add(consumoMax, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 125, 60, -1));
 
         jLabel8.setText("Capacidad vehícular:");
+        panel_configuración.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(127, 154, -1, -1));
 
         capVehicular.setValue(80);
+        panel_configuración.add(capVehicular, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 151, 60, -1));
 
         jLabel9.setText("Máxima población:");
+        panel_configuración.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 102, -1, -1));
 
         jLabel10.setText("Máximas generaciones:");
+        panel_configuración.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(396, 128, -1, -1));
 
         jLabel11.setText("Porcentaje de mutación:");
+        panel_configuración.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(391, 154, -1, -1));
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel1.setText("Configuración del algoritmo memético:");
+        panel_configuración.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(25, 177, -1, -1));
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel2.setText("Configuración general de los algoritmos:");
+        panel_configuración.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(25, 74, -1, -1));
 
         jLabel3.setText("Porcentaje de convergencia:");
+        panel_configuración.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(92, 215, -1, -1));
 
         porcConvergencia.setValue(100);
+        panel_configuración.add(porcConvergencia, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 212, 63, -1));
 
         jLabel12.setText("Porcentaje de preservación:");
+        panel_configuración.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(372, 215, -1, -1));
 
         porcPreservacion.setValue(99);
+        panel_configuración.add(porcPreservacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(542, 212, 63, -1));
 
         jButton3.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jButton3.setText("Ejecutar");
@@ -140,112 +179,60 @@ public class Interface extends javax.swing.JFrame {
                 jButton3ActionPerformed(evt);
             }
         });
+        panel_configuración.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 250, 131, 33));
 
         maxPoblacion.setValue(300);
+        panel_configuración.add(maxPoblacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(542, 99, 63, -1));
 
         porcMutacion.setValue(1);
+        panel_configuración.add(porcMutacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(542, 151, 63, -1));
 
         maxGeneraciones.setValue(30);
+        panel_configuración.add(maxGeneraciones, new org.netbeans.lib.awtextra.AbsoluteConstraints(542, 125, 63, -1));
 
-        javax.swing.GroupLayout panel_configuraciónLayout = new javax.swing.GroupLayout(panel_configuración);
-        panel_configuración.setLayout(panel_configuraciónLayout);
-        panel_configuraciónLayout.setHorizontalGroup(
-            panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_configuraciónLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(209, 209, 209))
-            .addGroup(panel_configuraciónLayout.createSequentialGroup()
-                .addGap(25, 25, 25)
-                .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panel_configuraciónLayout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(panel_configuraciónLayout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_configuraciónLayout.createSequentialGroup()
-                        .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(panel_configuraciónLayout.createSequentialGroup()
-                                .addGap(41, 41, 41)
-                                .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel6)
-                                    .addComponent(jLabel7)
-                                    .addComponent(jLabel8))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 41, Short.MAX_VALUE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_configuraciónLayout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(jLabel3)
-                                .addGap(38, 38, 38)))
-                        .addGap(12, 12, 12)
-                        .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(capVehicular, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(consumoMax, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(consumoBase, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(porcConvergencia, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(29, 29, 29)
-                        .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel12)
-                            .addComponent(jLabel11, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel10, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.TRAILING))
-                        .addGap(34, 34, 34)
-                        .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(maxGeneraciones, javax.swing.GroupLayout.DEFAULT_SIZE, 63, Short.MAX_VALUE)
-                            .addComponent(maxPoblacion)
-                            .addComponent(porcMutacion)
-                            .addComponent(porcPreservacion))
-                        .addGap(25, 25, 25))))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_configuraciónLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(text_clientes)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton1)
-                .addContainerGap())
-        );
-        panel_configuraciónLayout.setVerticalGroup(
-            panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panel_configuraciónLayout.createSequentialGroup()
-                .addGap(25, 25, 25)
-                .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(jButton1)
-                    .addComponent(text_clientes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(26, 26, 26)
-                .addComponent(jLabel2)
-                .addGap(8, 8, 8)
-                .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel9)
-                    .addComponent(maxPoblacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(consumoBase, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel6))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel10)
-                    .addComponent(maxGeneraciones, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(consumoMax, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel7))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(porcMutacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel11)
-                    .addComponent(capVehicular, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel8))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel1)
-                .addGap(18, 18, 18)
-                .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(porcConvergencia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel12)
-                    .addComponent(porcPreservacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)
-                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
+        jLabel5.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel5.setText("Resultados obtenidos:");
+        panel_configuración.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 280, -1, -1));
+
+        jLabel13.setText("Algoritmo Genético");
+        panel_configuración.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 310, -1, 20));
+
+        jLabel14.setText("Algoritmo Memético");
+        panel_configuración.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 310, -1, 20));
+
+        jLabel15.setText("Rutas:");
+        panel_configuración.add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 340, -1, 20));
+
+        rutas_gen.setColumns(20);
+        rutas_gen.setRows(5);
+        jScrollPane1.setViewportView(rutas_gen);
+
+        panel_configuración.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 360, 270, 90));
+
+        jLabel16.setText("Costo:");
+        panel_configuración.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 460, -1, -1));
+
+        jLabel17.setText("Fitness:");
+        panel_configuración.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 490, -1, -1));
+        panel_configuración.add(gen_costo, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 460, 113, -1));
+        panel_configuración.add(gen_fit, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 490, 113, -1));
+
+        jLabel18.setText("Rutas:");
+        panel_configuración.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 340, -1, 20));
+
+        rutas_mem.setColumns(20);
+        rutas_mem.setRows(5);
+        jScrollPane2.setViewportView(rutas_mem);
+
+        panel_configuración.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 360, 250, 90));
+
+        jLabel19.setText("Costo:");
+        panel_configuración.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 460, -1, -1));
+
+        jLabel20.setText("Fitness:");
+        panel_configuración.add(jLabel20, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 490, -1, -1));
+        panel_configuración.add(mem_costo, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 460, 113, -1));
+        panel_configuración.add(mem_fit, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 490, 113, -1));
 
         jTabbedPane1.addTab("Configuración", panel_configuración);
 
@@ -257,7 +244,7 @@ public class Interface extends javax.swing.JFrame {
         );
         panel_geneticoLayout.setVerticalGroup(
             panel_geneticoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 320, Short.MAX_VALUE)
+            .addGap(0, 532, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("Algoritmo Genético", panel_genetico);
@@ -270,12 +257,12 @@ public class Interface extends javax.swing.JFrame {
         );
         panel_memeticoLayout.setVerticalGroup(
             panel_memeticoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 320, Short.MAX_VALUE)
+            .addGap(0, 532, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("Algoritmo Memético", panel_memetico);
 
-        getContentPane().add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
+        getContentPane().add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 560));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -302,13 +289,46 @@ public class Interface extends javax.swing.JFrame {
         Cromosoma mejor2=memAlgoritmo.ejecutar();
         graficarSoluciones(mejor1,0);
         graficarSoluciones(mejor2,1);
+        mostrarResultados(mejor1,0);
+        mostrarResultados(mejor2,1);
     }//GEN-LAST:event_jButton3ActionPerformed
     
+    public void mostrarResultados(Cromosoma sol,int numAlgoritmo){
+        int indRuta=1;
+        JTextArea textArea=rutas_gen;
+        JTextField textCost=gen_costo;
+        JTextField textFit=gen_fit;
+        if(numAlgoritmo==1)  {
+            textArea=rutas_mem;
+            textCost=mem_costo;
+            textFit=mem_fit;
+        }
+        for(int i=0;i<sol.genes.size();i++){
+            if(sol.genes.get(i)>=nclientes){ // si es un almacen
+                if(i>0) {
+                    textArea.append("->T\n");
+                    indRuta++;
+                }// marcar fin de ruta
+                
+                int nAlmacen=(sol.genes.get(i)-nclientes-1)/maxusos; // determinamos el almacen
+                
+                textArea.append("Ruta "+indRuta+":T->A"+nAlmacen);
+            }
+            else{ // si es cliente
+                 textArea.append("->"+sol.genes.get(i));
+            }
+        }
+        textArea.append("->T");
+        int costoT=(int)sol.costo;
+        int fitT=(int)sol.fitness;
+        textCost.setText(""+costoT);
+        textFit.setText(""+fitT);
+        
+    }
     public void graficarSoluciones(Cromosoma gen, int algoritmo){
         XYSeriesCollection solGenSeries = new XYSeriesCollection();
         int numRuta=1;
         XYSeries ruta=null;
-        System.out.println("tam :"+gen.genes.size());
         for(int i=0;i<gen.genes.size();i++){
             if(gen.genes.get(i)>=nclientes){ // si es un almacen
                 //if(i>0) System.out.print("->T");// marcar fin de ruta
@@ -327,7 +347,6 @@ public class Interface extends javax.swing.JFrame {
         }
         String nombre="Grafica del Genético";
         if(algoritmo==1) nombre="Grafica del Memético";
-        System.out.println(solGenSeries.getSeries().size());
         JFreeChart xylineChartGen = ChartFactory.createXYLineChart(
                         nombre,
                         "Eje x",
@@ -344,7 +363,7 @@ public class Interface extends javax.swing.JFrame {
         }
         plotGen.setRenderer(rendererGen);
         ChartPanel panelGen = new ChartPanel(xylineChartGen);
-        panelGen.setPreferredSize(new Dimension(630, 320)); // ajusto tamaño
+        panelGen.setPreferredSize(new Dimension(630, 520)); // ajusto tamaño
         panelGen.setMouseWheelEnabled(true);
         if(algoritmo==0){
             panel_genetico.setLayout(new BorderLayout());
@@ -443,6 +462,8 @@ public class Interface extends javax.swing.JFrame {
     private javax.swing.JSpinner capVehicular;
     private javax.swing.JSpinner consumoBase;
     private javax.swing.JSpinner consumoMax;
+    private javax.swing.JTextField gen_costo;
+    private javax.swing.JTextField gen_fit;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton3;
     private javax.swing.JFileChooser jFileChooser1;
@@ -450,22 +471,37 @@ public class Interface extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
+    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JSpinner maxGeneraciones;
     private javax.swing.JSpinner maxPoblacion;
+    private javax.swing.JTextField mem_costo;
+    private javax.swing.JTextField mem_fit;
     private javax.swing.JPanel panel_configuración;
     private javax.swing.JPanel panel_genetico;
     private javax.swing.JPanel panel_memetico;
     private javax.swing.JSpinner porcConvergencia;
     private javax.swing.JSpinner porcMutacion;
     private javax.swing.JSpinner porcPreservacion;
+    private javax.swing.JTextArea rutas_gen;
+    private javax.swing.JTextArea rutas_mem;
     private javax.swing.JTextField text_clientes;
     // End of variables declaration//GEN-END:variables
 }

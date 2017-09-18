@@ -47,6 +47,7 @@ public class Genetico {
         this.consumoBase=consumoB;
         this.consumoLleno=consumoM;
         this.capvehiculo=capV;
+        this.MAXFIT=clientes.size()*22000;
         
     }    
     public void inicializarNodos(ArrayList<Cliente> clientes){
