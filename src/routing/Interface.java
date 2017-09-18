@@ -300,7 +300,7 @@ public class Interface extends javax.swing.JFrame {
         int consumoB=(int)consumoBase.getValue();
         int consumoM=(int)consumoMax.getValue();
         int probMut=(int)porcMutacion.getValue();
-        
+
         Genetico genAlgoritmo= new Genetico(clientes,centros,maxp,maxg,probMut
                 ,consumoB,consumoM,capV);        
         Cromosoma mejor1=genAlgoritmo.ejecutar();

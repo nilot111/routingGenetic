@@ -415,7 +415,7 @@ public class Memetico {
         for(int i=0;i<sol.genes.size();i++){
             if(sol.genes.get(i)>=nclientes){ // si es un almacen
                 if(i>0) System.out.print("->T");// marcar fin de ruta
-                int nAlmacen=(sol.genes.get(i)-nclientes)%maxUsosAlmacen; // determinamos el almacen
+                int nAlmacen=(sol.genes.get(i)-nclientes-1)/maxUsosAlmacen; // determinamos el almacen
                 System.out.print("//T->A"+nAlmacen);
             }
             else{ // si es cliente
