@@ -7,6 +7,8 @@ package routing;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -87,7 +89,7 @@ public class Interface extends javax.swing.JFrame {
             }
         });
 
-        text_clientes.setText("C:\\Users\\GUERRA\\Desktop\\Tesis 2\\Data\\p01");
+        text_clientes.setText("C:\\Users\\GUERRA\\Desktop\\Tesis 2\\Data\\p01.txt");
 
         jLabel5.setText("Ruta de archivo centros:");
 
@@ -292,26 +294,45 @@ public class Interface extends javax.swing.JFrame {
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
         leerArchivo();
+        System.out.println(clientes.get(49).getDemanda());
     }//GEN-LAST:event_jButton3ActionPerformed
     public void leerArchivo(){
         int n=0;
-        Scanner scanner = new Scanner(text_clientes.getText());
-        while (scanner.hasNext()) {
-            if (scanner.hasNextInt() && n<=11) {
-                //clientes.add(new Cliente(63,53,1)); // cliente 0
-                //integers.add(scanner.nextInt());
-                if(n==2) nclientes=scanner.nextInt();
-                else if(n==3) nCentros=scanner.nextInt();
-            } else {
-                scanner.next();
+        try (Scanner scanner = new Scanner(new FileReader(text_clientes.getText()))) {
+            while (scanner.hasNext()&& n<=(3+2*nCentros)) {
+                if (scanner.hasNextInt() ) {
+                    if(n==2) nclientes=scanner.nextInt();
+                    else if(n==3) nCentros=scanner.nextInt();
+                    else scanner.nextInt();
+                } else {                   
+                    scanner.next();
+                }
+                n++;
             }
-            n++;
-        }
-        while(scanner.hasNext()){
-            if (scanner.hasNextInt()){
-                
+            n=0;
+            int coordX=0,coordY=0,demanda=0,codExt=0;
+            while(scanner.hasNext()){
+                if (scanner.hasNextInt()){
+                    if(n==0) codExt=scanner.nextInt();
+                    else if(n==1) coordX=scanner.nextInt();
+                    else if(n==2) coordY=scanner.nextInt();
+                    else if(n==4) {
+                        demanda=scanner.nextInt();
+                        if(clientes.size()<nclientes)
+                            clientes.add(new Cliente(codExt,coordX,coordY,demanda));
+                        else centros.add(new Cliente(codExt,coordX,coordY,demanda));
+                    }
+                    else scanner.nextInt();
+                }
+                else scanner.next();
+                n++;
+                if(n==5){
+                    n=0;
+                    scanner.nextLine();
+                }
             }
-            else scanner.next();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Interface.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed

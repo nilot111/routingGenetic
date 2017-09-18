@@ -206,7 +206,7 @@
             </Component>
             <Component class="javax.swing.JTextField" name="text_clientes">
               <Properties>
-                <Property name="text" type="java.lang.String" value="C:\u005cUsers\u005cGUERRA\u005cDesktop\u005cTesis 2\u005cData\u005cp01" containsInvalidXMLChars="true"/>
+                <Property name="text" type="java.lang.String" value="C:\u005cUsers\u005cGUERRA\u005cDesktop\u005cTesis 2\u005cData\u005cp01.txt" containsInvalidXMLChars="true"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel5">

@@ -14,6 +14,7 @@ public class Cliente {
     private int coordenadaX;
     private int coordenadaY;
     private int demanda;
+    private int codExterno;
     //private int tipoProducto;// 0 -> primer almacen, 1->segundo almacen , 2-> tercer almacen
     static int counter=-1;
     Cliente(int coordenadaX,int coordenadaY,int demanda){
@@ -24,6 +25,15 @@ public class Cliente {
         this.demanda=demanda;
         //this.tipoProducto=tipo;
     }
+    Cliente(int codExterno,int coordenadaX,int coordenadaY,int demanda){
+        counter++;
+        this.id=counter;
+        this.coordenadaX=coordenadaX;
+        this.coordenadaY=coordenadaY;
+        this.demanda=demanda;
+        this.codExterno=codExterno;
+        //this.tipoProducto=tipo;
+    }    
     /**
      * @return the id
      */
