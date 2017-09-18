@@ -244,7 +244,9 @@ public class Memetico {
         int fitnessTotal=0;
 
         for(Cromosoma solucion : poblacion) {
-            solucion.fitness=MAXFIT-costoSolucion(solucion.genes); // debido a que se escogera según su fitness , invertimos costo
+            double costoSol=costoSolucion(solucion.genes);
+            solucion.costo=costoSol;
+            solucion.fitness=MAXFIT-costoSol; // debido a que se escogera según su fitness , invertimos costo
             fitnessTotal+=solucion.fitness;
         }
         //System.out.println(fitnessTotal);

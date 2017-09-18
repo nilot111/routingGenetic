@@ -5,6 +5,9 @@
  */
 package routing;
 
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -14,7 +17,16 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.scene.paint.Color;
 import javax.swing.JFileChooser;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 
 /**
  *
@@ -31,6 +43,7 @@ public class Interface extends javax.swing.JFrame {
     public File archCentros=null;
     public int nclientes=0;
     public int nCentros=0;
+    public int maxusos=10;
     
     public Interface() {
         initComponents();
@@ -51,9 +64,6 @@ public class Interface extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         text_clientes = new javax.swing.JTextField();
-        jLabel5 = new javax.swing.JLabel();
-        text_centros = new javax.swing.JTextField();
-        jButton2 = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
         consumoBase = new javax.swing.JSpinner();
         jLabel7 = new javax.swing.JLabel();
@@ -80,7 +90,7 @@ public class Interface extends javax.swing.JFrame {
         setSize(new java.awt.Dimension(1200, 1200));
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel4.setText("Ruta de archivo clientes:");
+        jLabel4.setText("Ruta de archivo:");
 
         jButton1.setText("Explorar");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -90,15 +100,6 @@ public class Interface extends javax.swing.JFrame {
         });
 
         text_clientes.setText("C:\\Users\\GUERRA\\Desktop\\Tesis 2\\Data\\p01.txt");
-
-        jLabel5.setText("Ruta de archivo centros:");
-
-        jButton2.setText("Explorar");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
 
         jLabel6.setText("Consumo de combustible base:");
 
@@ -150,6 +151,10 @@ public class Interface extends javax.swing.JFrame {
         panel_configuración.setLayout(panel_configuraciónLayout);
         panel_configuraciónLayout.setHorizontalGroup(
             panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_configuraciónLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(209, 209, 209))
             .addGroup(panel_configuraciónLayout.createSequentialGroup()
                 .addGap(25, 25, 25)
                 .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -160,72 +165,56 @@ public class Interface extends javax.swing.JFrame {
                         .addComponent(jLabel2)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_configuraciónLayout.createSequentialGroup()
-                        .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(panel_configuraciónLayout.createSequentialGroup()
-                                .addGap(50, 50, 50)
+                                .addGap(41, 41, 41)
                                 .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel4)
-                                    .addComponent(jLabel5))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(text_clientes)
-                                    .addComponent(text_centros))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jButton2, javax.swing.GroupLayout.Alignment.TRAILING)))
-                            .addGroup(panel_configuraciónLayout.createSequentialGroup()
-                                .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(panel_configuraciónLayout.createSequentialGroup()
-                                        .addGap(41, 41, 41)
-                                        .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                            .addComponent(jLabel6)
-                                            .addComponent(jLabel7)
-                                            .addComponent(jLabel8))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 41, Short.MAX_VALUE))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_configuraciónLayout.createSequentialGroup()
-                                        .addGap(0, 0, Short.MAX_VALUE)
-                                        .addComponent(jLabel3)
-                                        .addGap(38, 38, 38)))
-                                .addGap(12, 12, 12)
-                                .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(capVehicular, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(consumoMax, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(consumoBase, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(porcConvergencia, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(29, 29, 29)
-                                .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel12)
-                                    .addComponent(jLabel11, javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel10, javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.TRAILING))
-                                .addGap(34, 34, 34)
-                                .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(maxGeneraciones, javax.swing.GroupLayout.DEFAULT_SIZE, 63, Short.MAX_VALUE)
-                                    .addComponent(maxPoblacion)
-                                    .addComponent(porcMutacion)
-                                    .addComponent(porcPreservacion))))
+                                    .addComponent(jLabel6)
+                                    .addComponent(jLabel7)
+                                    .addComponent(jLabel8))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 41, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_configuraciónLayout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(jLabel3)
+                                .addGap(38, 38, 38)))
+                        .addGap(12, 12, 12)
+                        .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(capVehicular, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(consumoMax, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(consumoBase, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(porcConvergencia, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(29, 29, 29)
+                        .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel12)
+                            .addComponent(jLabel11, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel10, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.TRAILING))
+                        .addGap(34, 34, 34)
+                        .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(maxGeneraciones, javax.swing.GroupLayout.DEFAULT_SIZE, 63, Short.MAX_VALUE)
+                            .addComponent(maxPoblacion)
+                            .addComponent(porcMutacion)
+                            .addComponent(porcPreservacion))
                         .addGap(25, 25, 25))))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_configuraciónLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(209, 209, 209))
+                .addContainerGap()
+                .addComponent(jLabel4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(text_clientes)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton1)
+                .addContainerGap())
         );
         panel_configuraciónLayout.setVerticalGroup(
             panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_configuraciónLayout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(25, 25, 25)
                 .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(jButton1)
                     .addComponent(text_clientes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(jButton2)
-                    .addComponent(text_centros, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(26, 26, 26)
                 .addComponent(jLabel2)
                 .addGap(8, 8, 8)
                 .addGroup(panel_configuraciónLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -311,7 +300,55 @@ public class Interface extends javax.swing.JFrame {
         Memetico memAlgoritmo= new Memetico(clientes,centros,maxp,maxg,probMut
                 ,consumoB,consumoM,capV,porcCon,porcPre);
         Cromosoma mejor2=memAlgoritmo.ejecutar();
+        graficarSoluciones(mejor1,mejor2);
+        
     }//GEN-LAST:event_jButton3ActionPerformed
+    
+    public void graficarSoluciones(Cromosoma gen, Cromosoma mem){
+        XYSeriesCollection solGenSeries = new XYSeriesCollection();
+        int numRuta=1;
+        XYSeries ruta=null;
+        System.out.println("tam :"+gen.genes.size());
+        for(int i=0;i<gen.genes.size();i++){
+            if(gen.genes.get(i)>=nclientes){ // si es un almacen
+                //if(i>0) System.out.print("->T");// marcar fin de ruta
+                int nAlmacen=(gen.genes.get(i)-nclientes-1)/maxusos; // determinamos el almacen
+                //System.out.print("//T->A"+nAlmacen);
+                if(ruta!=null) solGenSeries.addSeries(ruta);
+                 ruta = new XYSeries("ruta "+numRuta);
+                 ruta.add(centros.get(nAlmacen).getCoordenadaX()
+                         , centros.get(nAlmacen).getCoordenadaY());
+                 numRuta++;
+            }
+            else{ // si es cliente
+                 ruta.add(clientes.get(gen.genes.get(i)).getCoordenadaX()
+                         ,clientes.get(gen.genes.get(i)).getCoordenadaY());
+            }            
+        }
+        System.out.println(solGenSeries.getSeries().size());
+        JFreeChart xylineChartGen = ChartFactory.createXYLineChart(
+                        "Grafica Genetico",
+                        "Eje x",
+                        "Eje y",
+                        solGenSeries,
+                        PlotOrientation.VERTICAL, true, true, false);
+        XYPlot plotGen = xylineChartGen.getXYPlot();
+        XYLineAndShapeRenderer rendererGen = new XYLineAndShapeRenderer();
+        for(int i=0;i<solGenSeries.getSeries().size();i++){ // pintamos
+            rendererGen.setSeriesPaint(i, new java.awt.Color((float)Math.random() //color aleatorio
+                    , (float)Math.random(), (float)Math.random()));
+//            rendererGen.setSeriesPaint(i,java.awt.Color.RED);
+            rendererGen.setSeriesStroke(i, new BasicStroke(1.0f));
+        }
+        plotGen.setRenderer(rendererGen);
+        ChartPanel panelGen = new ChartPanel(xylineChartGen);
+        panelGen.setPreferredSize(new Dimension(630, 320)); // ajusto tamaño
+        panelGen.setMouseWheelEnabled(true);
+        System.out.println("llegoal final");
+        panel_genetico.setLayout(new BorderLayout());
+        panel_genetico.add(panelGen, BorderLayout.NORTH);
+        pack();
+    }
     public void leerArchivo(){
         int n=0;
         try (Scanner scanner = new Scanner(new FileReader(text_clientes.getText()))) {
@@ -360,15 +397,6 @@ public class Interface extends javax.swing.JFrame {
         text_clientes.setText(fileName);
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-        JFileChooser chooser= new JFileChooser();
-        chooser.showOpenDialog(null);
-        archCentros= chooser.getSelectedFile();
-        String fileName=archCentros.getAbsolutePath();
-        text_centros.setText(fileName);        
-    }//GEN-LAST:event_jButton2ActionPerformed
-
     /**
      * @param args the command line arguments
      */
@@ -409,7 +437,6 @@ public class Interface extends javax.swing.JFrame {
     private javax.swing.JSpinner consumoBase;
     private javax.swing.JSpinner consumoMax;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabel1;
@@ -419,7 +446,6 @@ public class Interface extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
@@ -433,7 +459,6 @@ public class Interface extends javax.swing.JFrame {
     private javax.swing.JSpinner porcConvergencia;
     private javax.swing.JSpinner porcMutacion;
     private javax.swing.JSpinner porcPreservacion;
-    private javax.swing.JTextField text_centros;
     private javax.swing.JTextField text_clientes;
     // End of variables declaration//GEN-END:variables
 }

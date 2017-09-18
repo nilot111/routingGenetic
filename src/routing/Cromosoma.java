@@ -14,6 +14,7 @@ import java.util.ArrayList;
 public class Cromosoma {
     public ArrayList<Integer> genes ;
     public double fitness;
+    public double costo;
     
     public void print(){
         for(int i=0;i<genes.size();i++)
