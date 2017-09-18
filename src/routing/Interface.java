@@ -300,11 +300,11 @@ public class Interface extends javax.swing.JFrame {
         Memetico memAlgoritmo= new Memetico(clientes,centros,maxp,maxg,probMut
                 ,consumoB,consumoM,capV,porcCon,porcPre);
         Cromosoma mejor2=memAlgoritmo.ejecutar();
-        graficarSoluciones(mejor1,mejor2);
-        
+        graficarSoluciones(mejor1,0);
+        graficarSoluciones(mejor2,1);
     }//GEN-LAST:event_jButton3ActionPerformed
     
-    public void graficarSoluciones(Cromosoma gen, Cromosoma mem){
+    public void graficarSoluciones(Cromosoma gen, int algoritmo){
         XYSeriesCollection solGenSeries = new XYSeriesCollection();
         int numRuta=1;
         XYSeries ruta=null;
@@ -325,9 +325,11 @@ public class Interface extends javax.swing.JFrame {
                          ,clientes.get(gen.genes.get(i)).getCoordenadaY());
             }            
         }
+        String nombre="Grafica del Genético";
+        if(algoritmo==1) nombre="Grafica del Memético";
         System.out.println(solGenSeries.getSeries().size());
         JFreeChart xylineChartGen = ChartFactory.createXYLineChart(
-                        "Grafica Genetico",
+                        nombre,
                         "Eje x",
                         "Eje y",
                         solGenSeries,
@@ -344,9 +346,14 @@ public class Interface extends javax.swing.JFrame {
         ChartPanel panelGen = new ChartPanel(xylineChartGen);
         panelGen.setPreferredSize(new Dimension(630, 320)); // ajusto tamaño
         panelGen.setMouseWheelEnabled(true);
-        System.out.println("llegoal final");
-        panel_genetico.setLayout(new BorderLayout());
-        panel_genetico.add(panelGen, BorderLayout.NORTH);
+        if(algoritmo==0){
+            panel_genetico.setLayout(new BorderLayout());
+            panel_genetico.add(panelGen, BorderLayout.NORTH);         
+        }
+        else{
+            panel_memetico.setLayout(new BorderLayout());
+            panel_memetico.add(panelGen, BorderLayout.NORTH);             
+        }
         pack();
     }
     public void leerArchivo(){
