@@ -21,11 +21,12 @@ public class Genetico {
     private int consumoLleno=35;
     private int capvehiculo=10;
     private int numVehiculos=3;
-    private int maxUsosAlmacen=3;
+    private int maxUsosAlmacen=10;
     public int nclientes=0;
-    private int MAXFIT=30000;
+    private int MAXFIT=110000;
     public ArrayList<Cromosoma> poblacion= new ArrayList<>();
     public ArrayList<Cliente> almacenes = new ArrayList<>();
+    public ArrayList<Cliente> clientes = new ArrayList<>();
     public ArrayList<Cliente> nodos; // aqui se incluyen tanto clientes como Almacenes
     public Cliente terminal= new Cliente(0,0,0); // terminal de buses donde todos parten y vuelven
     Genetico(){
@@ -35,6 +36,19 @@ public class Genetico {
         
         
     }
+    
+    Genetico(ArrayList<Cliente> clientes,ArrayList<Cliente> centros,int maxp,int maxg,
+            int probM,int consumoB,int consumoM,int capV){
+        this.clientes=(ArrayList<Cliente>)clientes.clone();
+        this.almacenes=(ArrayList<Cliente>)centros.clone();
+        this.maxPoblacion=maxp;
+        this.maxGeneraciones=maxg;
+        this.probMutacion=(double)probM/100;
+        this.consumoBase=consumoB;
+        this.consumoLleno=consumoM;
+        this.capvehiculo=capV;
+        
+    }    
     public void inicializarNodos(ArrayList<Cliente> clientes){
         nodos=new ArrayList<>(clientes);
         int nroAlmacen=0;
@@ -43,7 +57,7 @@ public class Genetico {
             if(i%maxUsosAlmacen==0) nroAlmacen++;
         }        
     }
-    public Cromosoma ejecutar(ArrayList<Cliente> clientes){
+    public Cromosoma ejecutar(){
         nclientes=clientes.size();
         inicializarNodos(clientes); // se juntan tanto clientes como depositos
         inicializarPoblacion();
@@ -202,6 +216,7 @@ public class Genetico {
 
         for(Cromosoma solucion : poblacion) {
             solucion.fitness=MAXFIT-costoSolucion(solucion.genes); // debido a que se escogera según su fitness , invertimos costo
+            //System.out.println(costoSolucion(solucion.genes));
             fitnessTotal+=solucion.fitness;
         }
         //System.out.println(fitnessTotal);

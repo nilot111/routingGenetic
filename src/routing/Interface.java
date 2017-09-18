@@ -110,7 +110,7 @@ public class Interface extends javax.swing.JFrame {
 
         jLabel8.setText("Capacidad vehícular:");
 
-        capVehicular.setValue(10);
+        capVehicular.setValue(80);
 
         jLabel9.setText("Máxima población:");
 
@@ -126,11 +126,11 @@ public class Interface extends javax.swing.JFrame {
 
         jLabel3.setText("Porcentaje de convergencia:");
 
-        porcConvergencia.setValue(99);
+        porcConvergencia.setValue(100);
 
         jLabel12.setText("Porcentaje de preservación:");
 
-        porcPreservacion.setValue(50);
+        porcPreservacion.setValue(99);
 
         jButton3.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jButton3.setText("Ejecutar");
@@ -140,11 +140,11 @@ public class Interface extends javax.swing.JFrame {
             }
         });
 
-        maxPoblacion.setValue(200);
+        maxPoblacion.setValue(300);
 
         porcMutacion.setValue(1);
 
-        maxGeneraciones.setValue(20);
+        maxGeneraciones.setValue(30);
 
         javax.swing.GroupLayout panel_configuraciónLayout = new javax.swing.GroupLayout(panel_configuración);
         panel_configuración.setLayout(panel_configuraciónLayout);
@@ -294,7 +294,23 @@ public class Interface extends javax.swing.JFrame {
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
         leerArchivo();
-        System.out.println(clientes.get(49).getDemanda());
+        int maxp=(int)maxPoblacion.getValue();
+        int maxg=(int)maxGeneraciones.getValue();
+        int capV=(int)capVehicular.getValue();
+        int consumoB=(int)consumoBase.getValue();
+        int consumoM=(int)consumoMax.getValue();
+        int probMut=(int)porcMutacion.getValue();
+        
+        Genetico genAlgoritmo= new Genetico(clientes,centros,maxp,maxg,probMut
+                ,consumoB,consumoM,capV);        
+        Cromosoma mejor1=genAlgoritmo.ejecutar();
+        
+        
+        int porcCon=(int)porcConvergencia.getValue();
+        int porcPre=(int)porcPreservacion.getValue();
+        Memetico memAlgoritmo= new Memetico(clientes,centros,maxp,maxg,probMut
+                ,consumoB,consumoM,capV,porcCon,porcPre);
+        Cromosoma mejor2=memAlgoritmo.ejecutar();
     }//GEN-LAST:event_jButton3ActionPerformed
     public void leerArchivo(){
         int n=0;

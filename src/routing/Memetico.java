@@ -21,14 +21,15 @@ public class Memetico {
     private int consumoLleno=35;
     private int capvehiculo=10;
     private int numVehiculos=3;
-    private int maxUsosAlmacen=3;
+    private int maxUsosAlmacen=10;
     private int nclientes=0;
-    private int MAXFIT=30000;
+    private int MAXFIT=110000;
     private double porcConvergencia=0.98;
     private double porcPreservacion=0.6;
-    private int maxIntentos=5;
+    private int maxIntentos=4;
     public ArrayList<Cromosoma> poblacion= new ArrayList<>();
     public ArrayList<Cliente> almacenes = new ArrayList<>();
+    public ArrayList<Cliente> clientes = new ArrayList<>();
     public ArrayList<Cliente> nodos; // aqui se incluyen tanto clientes como Almacenes
     public Cliente terminal= new Cliente(0,0,0); // terminal de buses donde todos parten y vuelven
     Memetico(){
@@ -38,6 +39,19 @@ public class Memetico {
         
         
     }
+    Memetico(ArrayList<Cliente> clientes,ArrayList<Cliente> centros,int maxp,int maxg,
+            int probM,int consumoB,int consumoM,int capV,int porcCon,int porcPre){
+        this.clientes=(ArrayList<Cliente>)clientes.clone();
+        this.almacenes=(ArrayList<Cliente>)centros.clone();
+        this.maxPoblacion=maxp;
+        this.maxGeneraciones=maxg;
+        this.probMutacion=probM/100;
+        this.consumoBase=consumoB;
+        this.consumoLleno=consumoM;
+        this.capvehiculo=capV;
+        this.porcConvergencia=(double)porcCon/100;
+        this.porcPreservacion=(double)porcPre/100;
+    }    
     public void inicializarNodos(ArrayList<Cliente> clientes){
         nodos=new ArrayList<>(clientes);
         int nroAlmacen=0;
@@ -46,7 +60,7 @@ public class Memetico {
             if(i%maxUsosAlmacen==0) nroAlmacen++;
         }        
     }
-    public Cromosoma ejecutar(ArrayList<Cliente> clientes){
+    public Cromosoma ejecutar(){
         nclientes=clientes.size();
         inicializarNodos(clientes); // se juntan tanto clientes como depositos
         inicializarPoblacion();

@@ -38,19 +38,19 @@ public class Routing {
         almacenes.add(new Cliente(25,10,0));
         almacenes.add(new Cliente(50,10,0));
         //clientes.get(0).print();
-        Genetico genAlgoritmo= new Genetico();
-        Memetico memAlgoritmo= new Memetico();
-        Cromosoma mejor1=genAlgoritmo.ejecutar(clientes);
-        Cromosoma mejor2=memAlgoritmo.ejecutar(clientes);
+//        Genetico genAlgoritmo= new Genetico();
+//        Memetico memAlgoritmo= new Memetico();
+//        Cromosoma mejor1=genAlgoritmo.ejecutar(clientes);
+//        Cromosoma mejor2=memAlgoritmo.ejecutar(clientes);
 //        JFrame ventana=new JFrame("Rutas de pedidos");
 //        ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //        RoutingInterface panel = new RoutingInterface();
 //        ventana.add(panel);
 //        ventana.setSize(1300,700);
 //        ventana.setVisible(true);
-        int nclientes=genAlgoritmo.nclientes;
-        ArrayList<Cliente> nodos= genAlgoritmo.nodos;
-        XYSeriesCollection dataset = new XYSeriesCollection();
+//        int nclientes=genAlgoritmo.nclientes;
+//        ArrayList<Cliente> nodos= genAlgoritmo.nodos;
+//        XYSeriesCollection dataset = new XYSeriesCollection();
         
         
     }
