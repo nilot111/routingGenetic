@@ -18,11 +18,11 @@ public class Genetico {
     private int maxGeneraciones=30; // maxiteraciones
     private double probMutacion=0.01;
     private int consumoBase=20;
-    private int consumoLleno=25;
+    private int consumoLleno=35;
     private int capvehiculo=10;
     private int numVehiculos=3;
     private int maxUsosAlmacen=3;
-    private int nclientes=0;
+    public int nclientes=0;
     private int MAXFIT=30000;
     public ArrayList<Cromosoma> poblacion= new ArrayList<>();
     public ArrayList<Cliente> almacenes = new ArrayList<>();
@@ -43,7 +43,7 @@ public class Genetico {
             if(i%maxUsosAlmacen==0) nroAlmacen++;
         }        
     }
-    public void ejecutar(ArrayList<Cliente> clientes){
+    public Cromosoma ejecutar(ArrayList<Cliente> clientes){
         nclientes=clientes.size();
         inicializarNodos(clientes); // se juntan tanto clientes como depositos
         inicializarPoblacion();
@@ -69,6 +69,7 @@ public class Genetico {
 //        imprimeRecorrido(poblacionNueva.get(15));
         imprimeRecorrido(mejorSolucion);
         System.out.println(mejorSolucion.fitness);
+        return mejorSolucion;
     }
     
     public Cromosoma  obtenerMejor(ArrayList<Cromosoma> poblacion){

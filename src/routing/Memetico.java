@@ -18,7 +18,7 @@ public class Memetico {
     private int maxGeneraciones=30; // maxiteraciones
     private double probMutacion=0.01;
     private int consumoBase=20;
-    private int consumoLleno=25;
+    private int consumoLleno=35;
     private int capvehiculo=10;
     private int numVehiculos=3;
     private int maxUsosAlmacen=3;
@@ -46,7 +46,7 @@ public class Memetico {
             if(i%maxUsosAlmacen==0) nroAlmacen++;
         }        
     }
-    public void ejecutar(ArrayList<Cliente> clientes){
+    public Cromosoma ejecutar(ArrayList<Cliente> clientes){
         nclientes=clientes.size();
         inicializarNodos(clientes); // se juntan tanto clientes como depositos
         inicializarPoblacion();
@@ -85,6 +85,7 @@ public class Memetico {
 
         imprimeRecorrido(mejorSolucion);
         System.out.println(mejorSolucion.fitness);
+        return mejorSolucion;
     }
     
     public void reiniciarPoblacion(ArrayList<Cromosoma> poblacion){
