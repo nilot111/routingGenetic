@@ -24,6 +24,8 @@ import javax.swing.JTextField;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.annotations.XYPointerAnnotation;
+import org.jfree.chart.annotations.XYTextAnnotation;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
@@ -234,7 +236,7 @@ public class Interface extends javax.swing.JFrame {
         panel_configuración.add(mem_costo, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 460, 113, -1));
         panel_configuración.add(mem_fit, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 490, 113, -1));
 
-        jTabbedPane1.addTab("Configuración", panel_configuración);
+        jTabbedPane1.addTab("Configuración y resultados", panel_configuración);
 
         javax.swing.GroupLayout panel_geneticoLayout = new javax.swing.GroupLayout(panel_genetico);
         panel_genetico.setLayout(panel_geneticoLayout);
@@ -334,6 +336,13 @@ public class Interface extends javax.swing.JFrame {
                 //if(i>0) System.out.print("->T");// marcar fin de ruta
                 int nAlmacen=(gen.genes.get(i)-nclientes-1)/maxusos; // determinamos el almacen
                 //System.out.print("//T->A"+nAlmacen);
+                
+                
+//                XYPointerAnnotation pointer = new XYPointerAnnotation("Best Bid",
+//                        centros.get(nAlmacen).getCoordenadaX(), centros.get(nAlmacen).getCoordenadaY(),
+//                                                              3.0 * Math.PI / 4.0);
+                
+                
                 if(ruta!=null) solGenSeries.addSeries(ruta);
                  ruta = new XYSeries("ruta "+numRuta);
                  ruta.add(centros.get(nAlmacen).getCoordenadaX()
@@ -343,7 +352,8 @@ public class Interface extends javax.swing.JFrame {
             else{ // si es cliente
                  ruta.add(clientes.get(gen.genes.get(i)).getCoordenadaX()
                          ,clientes.get(gen.genes.get(i)).getCoordenadaY());
-            }            
+            }
+            if(i==(gen.genes.size()-1)) solGenSeries.addSeries(ruta);
         }
         String nombre="Grafica del Genético";
         if(algoritmo==1) nombre="Grafica del Memético";
@@ -354,6 +364,18 @@ public class Interface extends javax.swing.JFrame {
                         solGenSeries,
                         PlotOrientation.VERTICAL, true, true, false);
         XYPlot plotGen = xylineChartGen.getXYPlot();
+        for(int i=0;i<centros.size();i++){
+                XYPointerAnnotation pointer = new XYPointerAnnotation("Centro "+i,
+                        centros.get(i).getCoordenadaX(), centros.get(i).getCoordenadaY(),
+                                                              6.0 * Math.PI / 4.0);
+                plotGen.addAnnotation(pointer);            
+        }
+        System.out.println(clientes.size());
+        for(int i=0;i<clientes.size();i++){
+            XYTextAnnotation texCliente = new XYTextAnnotation(""+i,
+                    clientes.get(i).getCoordenadaX(), clientes.get(i).getCoordenadaY());
+            plotGen.addAnnotation(texCliente);
+        }
         XYLineAndShapeRenderer rendererGen = new XYLineAndShapeRenderer();
         for(int i=0;i<solGenSeries.getSeries().size();i++){ // pintamos
             rendererGen.setSeriesPaint(i, new java.awt.Color((float)Math.random() //color aleatorio
@@ -361,6 +383,7 @@ public class Interface extends javax.swing.JFrame {
 //            rendererGen.setSeriesPaint(i,java.awt.Color.RED);
             rendererGen.setSeriesStroke(i, new BasicStroke(1.0f));
         }
+        
         plotGen.setRenderer(rendererGen);
         ChartPanel panelGen = new ChartPanel(xylineChartGen);
         panelGen.setPreferredSize(new Dimension(630, 520)); // ajusto tamaño

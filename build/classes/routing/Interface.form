@@ -44,8 +44,8 @@
         <Container class="javax.swing.JPanel" name="panel_configuraci&#xf3;n">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Configuraci&#xf3;n">
-                <Property name="tabTitle" type="java.lang.String" value="Configuraci&#xf3;n"/>
+              <JTabbedPaneConstraints tabName="Configuraci&#xf3;n y resultados">
+                <Property name="tabTitle" type="java.lang.String" value="Configuraci&#xf3;n y resultados"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>
