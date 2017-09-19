@@ -344,7 +344,8 @@ public class Interface extends javax.swing.JFrame {
                 
                 
                 if(ruta!=null) solGenSeries.addSeries(ruta);
-                 ruta = new XYSeries("ruta "+numRuta);
+                 ruta = new XYSeries("ruta "+numRuta,false);
+                 
                  ruta.add(centros.get(nAlmacen).getCoordenadaX()
                          , centros.get(nAlmacen).getCoordenadaY());
                  numRuta++;
