@@ -14,6 +14,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -283,7 +284,6 @@ public class Interface extends javax.swing.JFrame {
                 ,consumoB,consumoM,capV);        
         Cromosoma mejor1=genAlgoritmo.ejecutar();
         
-        
         int porcCon=(int)porcConvergencia.getValue();
         int porcPre=(int)porcPreservacion.getValue();
         Memetico memAlgoritmo= new Memetico(clientes,centros,maxp,maxg,probMut
@@ -413,7 +413,7 @@ public class Interface extends javax.swing.JFrame {
                 n++;
             }
             n=0;
-            int coordX=0,coordY=0,demanda=0,codExt=0;
+            int coordX=0,coordY=0,demanda=0,codExt=0,tipoCentro=0;
             while(scanner.hasNext()){
                 if (scanner.hasNextInt()){
                     if(n==0) codExt=scanner.nextInt();
@@ -421,9 +421,15 @@ public class Interface extends javax.swing.JFrame {
                     else if(n==2) coordY=scanner.nextInt();
                     else if(n==4) {
                         demanda=scanner.nextInt();
-                        if(clientes.size()<nclientes)
-                            clientes.add(new Cliente(codExt,coordX,coordY,demanda));
-                        else centros.add(new Cliente(codExt,coordX,coordY,demanda));
+                        if(clientes.size()<nclientes){
+                            Random rand = new Random();
+                            int tipo=rand.nextInt(nCentros); // asignamos aleatoriamente el tipo
+                            clientes.add(new Cliente(codExt,coordX,coordY,demanda,tipo));
+                        }                           
+                        else {
+                            centros.add(new Cliente(codExt,coordX,coordY,demanda,tipoCentro));
+                            tipoCentro++;
+                        }
                     }
                     else scanner.nextInt();
                 }

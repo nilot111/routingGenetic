@@ -15,7 +15,7 @@ public class Cliente {
     private int coordenadaY;
     private int demanda;
     private int codExterno;
-    //private int tipoProducto;// 0 -> primer almacen, 1->segundo almacen , 2-> tercer almacen
+    private int tipoProducto;// 0 -> primer almacen, 1->segundo almacen , 2-> tercer almacen
     static int counter=-1;
     Cliente(int coordenadaX,int coordenadaY,int demanda){
         counter++;
@@ -25,21 +25,22 @@ public class Cliente {
         this.demanda=demanda;
         //this.tipoProducto=tipo;
     }
-    Cliente(int codExterno,int coordenadaX,int coordenadaY,int demanda){
+    Cliente(int codExterno,int coordenadaX,int coordenadaY,int demanda,int tipo){
         counter++;
         this.id=counter;
         this.coordenadaX=coordenadaX;
         this.coordenadaY=coordenadaY;
         this.demanda=demanda;
         this.codExterno=codExterno;
+        this.tipoProducto=tipo;
         //this.tipoProducto=tipo;
-    }    
+    }
     /**
      * @return the id
      */
     public void print(){
         System.out.println("Cliente "+id+": ("+coordenadaX+","+coordenadaY+") "
-        +demanda);
+        +demanda+" <"+tipoProducto+">");
     }
     public int getId() {
         return id;
@@ -92,5 +93,19 @@ public class Cliente {
      */
     public void setDemanda(int demanda) {
         this.demanda = demanda;
+    }
+
+    /**
+     * @return the tipoProducto
+     */
+    public int getTipoProducto() {
+        return tipoProducto;
+    }
+
+    /**
+     * @param tipoProducto the tipoProducto to set
+     */
+    public void setTipoProducto(int tipoProducto) {
+        this.tipoProducto = tipoProducto;
     }
 }
