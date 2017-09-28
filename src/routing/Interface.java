@@ -126,6 +126,11 @@ public class Interface extends javax.swing.JFrame {
         panel_configuración.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(547, 25, -1, -1));
 
         text_clientes.setText("C:\\Users\\GUERRA\\Desktop\\Tesis 2\\Data\\p01.txt");
+        text_clientes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                text_clientesActionPerformed(evt);
+            }
+        });
         panel_configuración.add(text_clientes, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 26, 437, -1));
 
         jLabel6.setText("Consumo de combustible base:");
@@ -282,17 +287,17 @@ public class Interface extends javax.swing.JFrame {
 
         Genetico genAlgoritmo= new Genetico(clientes,centros,maxp,maxg,probMut
                 ,consumoB,consumoM,capV);        
-        Cromosoma mejor1=genAlgoritmo.ejecutar();
+        Cromosoma mejor1=genAlgoritmo.ejecutarMulti();
         
-        int porcCon=(int)porcConvergencia.getValue();
-        int porcPre=(int)porcPreservacion.getValue();
-        Memetico memAlgoritmo= new Memetico(clientes,centros,maxp,maxg,probMut
-                ,consumoB,consumoM,capV,porcCon,porcPre);
-        Cromosoma mejor2=memAlgoritmo.ejecutar();
-        graficarSoluciones(mejor1,0);
-        graficarSoluciones(mejor2,1);
-        mostrarResultados(mejor1,0);
-        mostrarResultados(mejor2,1);
+//        int porcCon=(int)porcConvergencia.getValue();
+//        int porcPre=(int)porcPreservacion.getValue();
+//        Memetico memAlgoritmo= new Memetico(clientes,centros,maxp,maxg,probMut
+//                ,consumoB,consumoM,capV,porcCon,porcPre);
+//        Cromosoma mejor2=memAlgoritmo.ejecutar();
+//        graficarSoluciones(mejor1,0);
+//        graficarSoluciones(mejor2,1);
+//        mostrarResultados(mejor1,0);
+//        mostrarResultados(mejor2,1);
     }//GEN-LAST:event_jButton3ActionPerformed
     
     public void mostrarResultados(Cromosoma sol,int numAlgoritmo){
@@ -452,6 +457,10 @@ public class Interface extends javax.swing.JFrame {
         String fileName=archClientes.getAbsolutePath();
         text_clientes.setText(fileName);
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void text_clientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_text_clientesActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_text_clientesActionPerformed
 
     /**
      * @param args the command line arguments
