@@ -125,7 +125,7 @@ public class Interface extends javax.swing.JFrame {
         });
         panel_configuración.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(547, 25, -1, -1));
 
-        text_clientes.setText("C:\\Users\\GUERRA\\Desktop\\Tesis 2\\Data\\p01.txt");
+        text_clientes.setText("C:\\Users\\GUERRA\\Desktop\\Tesis 2\\Data\\test.txt");
         text_clientes.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 text_clientesActionPerformed(evt);

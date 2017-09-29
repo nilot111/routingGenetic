@@ -79,7 +79,7 @@
             </Component>
             <Component class="javax.swing.JTextField" name="text_clientes">
               <Properties>
-                <Property name="text" type="java.lang.String" value="C:\u005cUsers\u005cGUERRA\u005cDesktop\u005cTesis 2\u005cData\u005cp01.txt" containsInvalidXMLChars="true"/>
+                <Property name="text" type="java.lang.String" value="C:\u005cUsers\u005cGUERRA\u005cDesktop\u005cTesis 2\u005cData\u005ctest.txt" containsInvalidXMLChars="true"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="text_clientesActionPerformed"/>

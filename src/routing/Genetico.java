@@ -62,6 +62,15 @@ public class Genetico {
             if(i%maxUsosAlmacen==0) nroAlmacen++;
         }        
     }
+    
+    public void inicializarNodosMulti(ArrayList<Cliente> clientes){
+        nodos=new ArrayList<>(clientes);
+        int nroAlmacen=0;
+        for(int i=0;i<almacenes.size();i++){ //inicializamos nodos con clientes y almacenes
+            nodos.add(almacenes.get(i));
+        }        
+    }    
+    
     public Cromosoma ejecutar(){
         
         inicializarNodos(clientes); // se juntan tanto clientes como depositos
@@ -96,7 +105,7 @@ public class Genetico {
     
     public Cromosoma ejecutarMulti(){
         
-        inicializarNodos(clientes); // se juntan tanto clientes como depositos
+        inicializarNodosMulti(clientes); // se juntan tanto clientes como depositos
         inicializarPoblacionMulti();
         ArrayList<Cromosoma> poblacionNueva= new ArrayList<>(poblacion);
         
@@ -122,9 +131,16 @@ public class Genetico {
 //        }
 //        imprimeRecorrido(poblacionNueva.get(10));
 //        imprimeRecorrido(poblacionNueva.get(15));
-        imprimeRecorridoMulti(mejorSolucion);
-        double costo=costoSolucionMulti(mejorSolucion.genes);
-        System.out.println(costo);
+
+        Cromosoma hijo=crossoverMulti(poblacionNueva.get(0),poblacionNueva.get(1));
+        imprimeRecorridoMulti(poblacionNueva.get(0));
+        System.out.println("==");
+        imprimeRecorridoMulti(poblacionNueva.get(1));
+        System.out.println("==");
+        imprimeRecorridoMulti(hijo);
+        System.out.println("==");        
+        //double costo=costoSolucionMulti(mejorSolucion.genes);
+        //System.out.println(costo);
         return mejorSolucion;
     }
     
@@ -237,33 +253,51 @@ public class Genetico {
 
     public Cromosoma crossoverMulti(Cromosoma padre, Cromosoma madre){
         Cromosoma hijo=new Cromosoma(); // inicializo con la madre
-        ArrayList<ArrayList<Integer>> rutasPadre= obtenerRutasMulti(padre.genes);
         ArrayList<ArrayList<Integer>> rutasMadre= obtenerRutasMulti(madre.genes);
         Random ran=new Random();
         ArrayList<Integer> rutaRandom=rutasMadre.get(ran.nextInt(rutasMadre.size())); // obtengo ruta random de madre
         ArrayList<Integer> genes=(ArrayList<Integer>)padre.genes.clone();
-        for(int i=1;i<rutaRandom.size();i++){ // elimino los clientes
-            genes.remove(genes.indexOf(rutaRandom.get(i)));
-        }     
-        for(int j=1;j<rutaRandom.size();j++){ //inserto evluando costos desde 1 porq 0 es el almacen
-            double costoMin=10000000;
-            int indMin=0;
-            for(int h=1;h<genes.size();h++){ // el primer gen no puede ser un cliente
-                genes.add(h,rutaRandom.get(j));
-                if(verificarGenes(genes)){ // si es factible
-                    double costo=costoSolucion(genes);
-                    if(costo<costoMin){
-                        costoMin=costo;
-                        indMin=h;
-                    }
-                    
+        for(int i=0;i<rutaRandom.size();i++){ // elimino los clientes
+            int indEliminar=genes.indexOf(rutaRandom.get(i));
+            boolean eliCentros=false;
+            if(rutaRandom.get(i)<nclientes){
+                if(genes.get(indEliminar-1)>=nclientes && ((indEliminar==genes.size()-1)|| 
+                        genes.get(indEliminar+1)>=nclientes )){ // si es una ruta q se queda sin clientes
+                    eliCentros=true;
                 }
-                genes.remove(h);
+                genes.remove(indEliminar);
+                indEliminar--;
+                if(eliCentros){
+                    while(indEliminar>=0 && genes.get(indEliminar)>=nclientes)
+                        genes.remove(indEliminar--);
+                }
+            }    
+        }
+        for(int j=0;j<rutaRandom.size();j++){ //inserto evluando costos 
+            if(rutaRandom.get(j)<nclientes){
+                double costoMin=100000000;
+                int indMin=0;
+                for(int h=0;h<genes.size();h++){ // 
+                    if(genes.get(h)<nclientes){
+                        genes.add(h,rutaRandom.get(j));
+                        if(verificarMulti(genes)){ // si es factible
+                            double costo=costoSolucionMulti(genes);
+                            if(costo<costoMin){
+                                costoMin=costo;
+                                indMin=h;
+                            }
+
+                        }
+                        genes.remove(h);                        
+                    }
+                }
+                genes.add(indMin,rutaRandom.get(j));                
             }
-            genes.add(indMin,rutaRandom.get(j));
-        }          
+
+        }
+        System.out.println();        
         hijo.genes=(ArrayList<Integer>)genes.clone();
-        hijo.genes=limpiarCromosoma(hijo);
+        hijo.genes=limpiarCromosomaMulti(hijo);
         return hijo;
     }
 
@@ -407,7 +441,6 @@ public class Genetico {
     public ArrayList<Integer> limpiarCromosomaMulti(Cromosoma sol){
         ArrayList<Integer> limpio= new ArrayList<>();
         int n=sol.genes.size()-1;
-        while(sol.genes.get(n)>=nclientes) n--; // ignoramos los ultimos centros
         while(n>=0){
             Set<Integer> setTipos= new HashSet<>();
             while(n>=0 && sol.genes.get(n)<nclientes){ // mientras sea un cliente
@@ -416,14 +449,14 @@ public class Genetico {
                 n--;
             }
             // agregamos solo los centros que son necesarios
+            int indComienzo=limpio.size();
             while(n>=0 && sol.genes.get(n)>=nclientes){
-                if(setTipos.contains(nodos.get(sol.genes.get(n)).getTipoProducto())){
-                    setTipos.remove(nodos.get(sol.genes.get(n)).getTipoProducto()); // ya no necesitamos otro centro del mismo tipo
-                    limpio.add(sol.genes.get(n));
-                    n--;
-                }
+                if(setTipos.contains(nodos.get(sol.genes.get(n)).getTipoProducto()))
+                    if(!limpio.subList(indComienzo,limpio.size()).contains(sol.genes.get(n))) limpio.add(sol.genes.get(n));
+                n--;
             }
         }
+        Collections.reverse(limpio);
         return limpio;
     }
         
@@ -475,6 +508,8 @@ public class Genetico {
                     setTipos.add(clientesCopy.get(indiceCliente).getTipoProducto());
                     clientesCopy.remove((int) indiceCliente); // remuevo al cliente que ya fue asignado
                     indiceCliente++;
+                    Random rand =new Random();
+                    if(rand.nextFloat()<0.05*indiceCliente) break; // probabilida para no generar rutas tan llenas
                 }
                 int indStart=origen.genes.size();
                 //agregamos los centros necesarios para esos clientes
@@ -518,45 +553,21 @@ public class Genetico {
         return true;
     }
     
-    public boolean verificarMulti(Cromosoma solucion){
-        ArrayList<Integer> genes=solucion.genes;
-        if(genes.get(0)<nclientes) return false; // si comienza por cliente no va
-        else{
+    public boolean verificarMulti(ArrayList<Integer> genes){
+        ArrayList<ArrayList<Integer>> rutas=obtenerRutasMulti(genes);
+        for(ArrayList<Integer> ruta : rutas){
+            ArrayList<Integer> tiposenRuta= new ArrayList<>();
             int i=0;
-            int nruta=0;
-            while(i<genes.size()){ // mientras recorra todo el arreglo
-                Set<Integer> setTipos= new HashSet<>();// no permite duplicados
-                while(i<genes.size() && genes.get(i)>=nclientes ) {
-                    setTipos.add(nodos.get(genes.get(i)).getTipoProducto());// determinamos que tipos de productos lleva
-                    i++;
-                } // Avanzar hasta encontrar un cliente o terminar arreglo
-                System.out.println("======================="+nruta+"=========================");
-                nruta++;
-                System.out.print("Tipos permitidos: ");
-                for(Integer tipo: setTipos){
-                    System.out.print(tipo+"-");
-                }
-                System.out.println();
-                System.out.println("Inicio tipos demanda");
-                int carga=0; // Inicializar carga cuando haya un centro
-                if(i>=genes.size()) break;
-                while(i<genes.size() && genes.get(i)<nclientes ){ // mientras sean clientes aumentar carga
-                    System.out.print(nodos.get(genes.get(i)).getTipoProducto()+"-");
-                    if(!setTipos.contains(nodos.get(genes.get(i)).getTipoProducto())) {
-                        if(i==genes.size()-1) return false;
-                        Collections.shuffle(genes.subList(i,genes.size()));
-                        continue;
-                    } // no tiene el tipo de producto 
-                    carga+=nodos.get(genes.get(i)).getDemanda();            //  solicitado por el cliente 
-                    if(carga>capvehiculo) {
-                        if(i==genes.size()-1) return false;
-                        Collections.shuffle(genes.subList(i,genes.size()));
-                        continue;
-                    }                    
-                    i++;
-
-                }
-                
+            while(ruta.get(i)>=nclientes){ // mientras sea un centro
+                tiposenRuta.add(nodos.get(ruta.get(i)).getTipoProducto());
+                i++;
+            }
+            int carga=0;
+            while(i<ruta.size()){
+                if(carga+nodos.get(ruta.get(i)).getDemanda()>capvehiculo) return false;
+                if(!tiposenRuta.contains(nodos.get(ruta.get(i)).getTipoProducto())) return false;
+                carga+=nodos.get(ruta.get(i)).getDemanda();
+                i++;
             }
         }
         return true;
