@@ -8,34 +8,26 @@ package routing;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.scene.paint.Color;
+
 import javax.swing.JFileChooser;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartMouseEvent;
-import org.jfree.chart.ChartMouseListener;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.annotations.XYPointerAnnotation;
 import org.jfree.chart.annotations.XYTextAnnotation;
-import org.jfree.chart.entity.ChartEntity;
-import org.jfree.chart.entity.LegendItemEntity;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
@@ -55,7 +47,9 @@ public class Interface extends javax.swing.JFrame {
     public int nclientes=0;
     public int nCentros=0;
     public int maxusos=10;
-    
+    public boolean mostrarTodos=true;
+    XYPlot plotGenetico=null;
+    XYPlot plotMem=null;
     public Interface() {
         initComponents();
     }
@@ -112,6 +106,9 @@ public class Interface extends javax.swing.JFrame {
         mem_costo = new javax.swing.JTextField();
         mem_fit = new javax.swing.JTextField();
         panel_genetico = new javax.swing.JPanel();
+        jLabel21 = new javax.swing.JLabel();
+        genroute = new javax.swing.JSpinner();
+        jButton2 = new javax.swing.JButton();
         panel_memetico = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -221,15 +218,15 @@ public class Interface extends javax.swing.JFrame {
         rutas_gen.setRows(5);
         jScrollPane1.setViewportView(rutas_gen);
 
-        panel_configuración.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 360, 270, 90));
+        panel_configuración.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 360, 270, 110));
 
         jLabel16.setText("Costo:");
-        panel_configuración.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 460, -1, -1));
+        panel_configuración.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 490, -1, -1));
 
         jLabel17.setText("Fitness:");
-        panel_configuración.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 490, -1, -1));
-        panel_configuración.add(gen_costo, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 460, 113, -1));
-        panel_configuración.add(gen_fit, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 490, 113, -1));
+        panel_configuración.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 520, -1, -1));
+        panel_configuración.add(gen_costo, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 490, 113, -1));
+        panel_configuración.add(gen_fit, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 520, 113, -1));
 
         jLabel18.setText("Rutas:");
         panel_configuración.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 340, -1, 20));
@@ -238,27 +235,52 @@ public class Interface extends javax.swing.JFrame {
         rutas_mem.setRows(5);
         jScrollPane2.setViewportView(rutas_mem);
 
-        panel_configuración.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 360, 250, 90));
+        panel_configuración.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 360, 250, 110));
 
         jLabel19.setText("Costo:");
-        panel_configuración.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 460, -1, -1));
+        panel_configuración.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 490, -1, -1));
 
         jLabel20.setText("Fitness:");
-        panel_configuración.add(jLabel20, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 490, -1, -1));
-        panel_configuración.add(mem_costo, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 460, 113, -1));
-        panel_configuración.add(mem_fit, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 490, 113, -1));
+        panel_configuración.add(jLabel20, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 520, -1, -1));
+        panel_configuración.add(mem_costo, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 490, 113, -1));
+        panel_configuración.add(mem_fit, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 520, 113, -1));
 
         jTabbedPane1.addTab("Configuración y resultados", panel_configuración);
+
+        jLabel21.setText("Ruta: ");
+
+        genroute.setValue(1);
+
+        jButton2.setText("Seleccionar/ Mostrar todos");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panel_geneticoLayout = new javax.swing.GroupLayout(panel_genetico);
         panel_genetico.setLayout(panel_geneticoLayout);
         panel_geneticoLayout.setHorizontalGroup(
             panel_geneticoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 630, Short.MAX_VALUE)
+            .addGroup(panel_geneticoLayout.createSequentialGroup()
+                .addGap(176, 176, 176)
+                .addComponent(jLabel21)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(genroute, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(27, 27, 27)
+                .addComponent(jButton2)
+                .addContainerGap(269, Short.MAX_VALUE))
         );
         panel_geneticoLayout.setVerticalGroup(
             panel_geneticoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 532, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_geneticoLayout.createSequentialGroup()
+                .addContainerGap(528, Short.MAX_VALUE)
+                .addGroup(panel_geneticoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_geneticoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel21)
+                        .addComponent(genroute, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jButton2, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addContainerGap())
         );
 
         jTabbedPane1.addTab("Algoritmo Genético", panel_genetico);
@@ -267,16 +289,16 @@ public class Interface extends javax.swing.JFrame {
         panel_memetico.setLayout(panel_memeticoLayout);
         panel_memeticoLayout.setHorizontalGroup(
             panel_memeticoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 630, Short.MAX_VALUE)
+            .addGap(0, 718, Short.MAX_VALUE)
         );
         panel_memeticoLayout.setVerticalGroup(
             panel_memeticoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 532, Short.MAX_VALUE)
+            .addGap(0, 562, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("Algoritmo Memético", panel_memetico);
 
-        getContentPane().add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 560));
+        getContentPane().add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 590));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -421,15 +443,16 @@ public class Interface extends javax.swing.JFrame {
         }
         
         plotGen.setRenderer(rendererGen);
-        plotGen.getRenderer().setSeriesVisible(0,false);
         ChartPanel panelGen = new ChartPanel(xylineChartGen);
         panelGen.setPreferredSize(new Dimension(630, 520)); // ajusto tamaño
         panelGen.setMouseWheelEnabled(true);
         if(algoritmo==0){
+            plotGenetico=plotGen;
             panel_genetico.setLayout(new BorderLayout());
             panel_genetico.add(panelGen, BorderLayout.NORTH);         
         }
         else{
+            plotMem=plotGen;
             panel_memetico.setLayout(new BorderLayout());
             panel_memetico.add(panelGen, BorderLayout.NORTH);             
         }
@@ -473,7 +496,7 @@ public class Interface extends javax.swing.JFrame {
                                                               6.0 * Math.PI / 4.0);
                 plotGen.addAnnotation(pointer);            
         }
-        System.out.println(clientes.size());
+        
         for(int i=0;i<clientes.size();i++){
             XYTextAnnotation texCliente = new XYTextAnnotation(""+i,
                     clientes.get(i).getCoordenadaX(), clientes.get(i).getCoordenadaY());
@@ -560,6 +583,22 @@ public class Interface extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_text_clientesActionPerformed
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        // Seleccionar ruta / mostrar todas rutas
+        int numRuta=(int)genroute.getValue()-1;
+        if(mostrarTodos){
+            for(int i=0;i<plotGenetico.getSeriesCount();i++){
+                if(i!=numRuta) plotGenetico.getRenderer().setSeriesVisible(i,false);
+            }
+        }
+        else{
+            for(int i=0;i<plotGenetico.getSeriesCount();i++)
+                plotGenetico.getRenderer().setSeriesVisible(i,true);
+        }
+        mostrarTodos=!mostrarTodos;
+    }//GEN-LAST:event_jButton2ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -601,7 +640,9 @@ public class Interface extends javax.swing.JFrame {
     private javax.swing.JSpinner consumoMax;
     private javax.swing.JTextField gen_costo;
     private javax.swing.JTextField gen_fit;
+    private javax.swing.JSpinner genroute;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabel1;
@@ -617,6 +658,7 @@ public class Interface extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
