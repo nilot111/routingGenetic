@@ -269,7 +269,7 @@ public class Interface extends javax.swing.JFrame {
                 .addComponent(genroute, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(27, 27, 27)
                 .addComponent(jButton2)
-                .addContainerGap(269, Short.MAX_VALUE))
+                .addContainerGap(196, Short.MAX_VALUE))
         );
         panel_geneticoLayout.setVerticalGroup(
             panel_geneticoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -289,7 +289,7 @@ public class Interface extends javax.swing.JFrame {
         panel_memetico.setLayout(panel_memeticoLayout);
         panel_memeticoLayout.setHorizontalGroup(
             panel_memeticoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 718, Short.MAX_VALUE)
+            .addGap(0, 645, Short.MAX_VALUE)
         );
         panel_memeticoLayout.setVerticalGroup(
             panel_memeticoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -298,7 +298,7 @@ public class Interface extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Algoritmo Memético", panel_memetico);
 
-        getContentPane().add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 590));
+        getContentPane().add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 650, 590));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
