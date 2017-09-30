@@ -115,7 +115,7 @@ public class Genetico {
         for(int i=0;i<=maxGeneraciones;i++){
             fitnessPromedio=evaluarMulti(poblacionNueva);
             if(i==maxGeneraciones) break;
-            System.out.println("fitness promedio generacion "+i+" : "+fitnessPromedio);
+            //System.out.println("fitness promedio generacion "+i+" : "+fitnessPromedio);
             reproduccionMulti(poblacionNueva,fitnessPromedio);    
         }
         

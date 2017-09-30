@@ -23,13 +23,19 @@ import javax.swing.JFileChooser;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartMouseEvent;
+import org.jfree.chart.ChartMouseListener;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.annotations.XYPointerAnnotation;
 import org.jfree.chart.annotations.XYTextAnnotation;
+import org.jfree.chart.entity.ChartEntity;
+import org.jfree.chart.entity.LegendItemEntity;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
@@ -401,7 +407,6 @@ public class Interface extends javax.swing.JFrame {
                                                               6.0 * Math.PI / 4.0);
                 plotGen.addAnnotation(pointer);            
         }
-        System.out.println(clientes.size());
         for(int i=0;i<clientes.size();i++){
             XYTextAnnotation texCliente = new XYTextAnnotation(""+i,
                     clientes.get(i).getCoordenadaX(), clientes.get(i).getCoordenadaY());
@@ -416,6 +421,7 @@ public class Interface extends javax.swing.JFrame {
         }
         
         plotGen.setRenderer(rendererGen);
+        plotGen.getRenderer().setSeriesVisible(0,false);
         ChartPanel panelGen = new ChartPanel(xylineChartGen);
         panelGen.setPreferredSize(new Dimension(630, 520)); // ajusto tamaño
         panelGen.setMouseWheelEnabled(true);
@@ -428,6 +434,7 @@ public class Interface extends javax.swing.JFrame {
             panel_memetico.add(panelGen, BorderLayout.NORTH);             
         }
         pack();
+        
     }
     
     public void graficarSoluciones(Cromosoma gen, int algoritmo){
@@ -482,6 +489,7 @@ public class Interface extends javax.swing.JFrame {
         
         plotGen.setRenderer(rendererGen);
         ChartPanel panelGen = new ChartPanel(xylineChartGen);
+        
         panelGen.setPreferredSize(new Dimension(630, 520)); // ajusto tamaño
         panelGen.setMouseWheelEnabled(true);
         if(algoritmo==0){
