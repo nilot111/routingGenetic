@@ -294,9 +294,9 @@ public class Interface extends javax.swing.JFrame {
 //        Memetico memAlgoritmo= new Memetico(clientes,centros,maxp,maxg,probMut
 //                ,consumoB,consumoM,capV,porcCon,porcPre);
 //        Cromosoma mejor2=memAlgoritmo.ejecutar();
-//        graficarSoluciones(mejor1,0);
+        graficarSolucionesMulti(mejor1,0);
 //        graficarSoluciones(mejor2,1);
-//        mostrarResultados(mejor1,0);
+        mostrarResultadosMulti(mejor1,0);
 //        mostrarResultados(mejor2,1);
     }//GEN-LAST:event_jButton3ActionPerformed
     
@@ -332,6 +332,104 @@ public class Interface extends javax.swing.JFrame {
         textFit.setText(""+fitT);
         
     }
+    
+    public void mostrarResultadosMulti(Cromosoma sol,int numAlgoritmo){
+        int indRuta=1;
+        JTextArea textArea=rutas_gen;
+        JTextField textCost=gen_costo;
+        JTextField textFit=gen_fit;
+        if(numAlgoritmo==1)  {
+            textArea=rutas_mem;
+            textCost=mem_costo;
+            textFit=mem_fit;
+        }
+        int h=0;
+        while(h<sol.genes.size()){
+            textArea.append("Ruta "+indRuta+":T->");
+            while(h<sol.genes.size() && sol.genes.get(h)>=nclientes){ // mientras sea un centro
+                int ncentro=sol.genes.get(h)-nclientes;
+                textArea.append("C"+ncentro+"->");
+                h++;
+            }
+            while(h<sol.genes.size()&& sol.genes.get(h)<nclientes){// mientras sea un cliente
+                textArea.append(sol.genes.get(h)+"->");
+                h++;
+            }
+            textArea.append("T\n");
+            indRuta++;            
+        }
+        int costoT=(int)sol.costo;
+        int fitT=(int)sol.fitness;
+        textCost.setText(""+costoT);
+        textFit.setText(""+fitT);
+        
+    }
+    public void graficarSolucionesMulti(Cromosoma gen, int algoritmo){
+        XYSeriesCollection solGenSeries = new XYSeriesCollection();
+        int indRuta=1;
+        XYSeries ruta=null;
+        int h=0;
+        while(h<gen.genes.size()){
+            ruta = new XYSeries("ruta "+indRuta,false);
+            while(h<gen.genes.size() && gen.genes.get(h)>=nclientes){ // mientras sea un centro
+                int ncentro=gen.genes.get(h)-nclientes;
+                ruta.add(centros.get(ncentro).getCoordenadaX()
+                         , centros.get(ncentro).getCoordenadaY());                
+                h++;
+            }
+            while(h<gen.genes.size()&& gen.genes.get(h)<nclientes){// mientras sea un cliente
+                ruta.add(clientes.get(gen.genes.get(h)).getCoordenadaX()
+                         ,clientes.get(gen.genes.get(h)).getCoordenadaY());                
+                h++;
+            }
+            solGenSeries.addSeries(ruta);
+            indRuta++;            
+        }
+        
+        String nombre="Grafica del Genético";
+        if(algoritmo==1) nombre="Grafica del Memético";
+        JFreeChart xylineChartGen = ChartFactory.createXYLineChart(
+                        nombre,
+                        "Eje x",
+                        "Eje y",
+                        solGenSeries,
+                        PlotOrientation.VERTICAL, true, true, false);
+        XYPlot plotGen = xylineChartGen.getXYPlot();
+        for(int i=0;i<centros.size();i++){
+                XYPointerAnnotation pointer = new XYPointerAnnotation("Centro "+i,
+                        centros.get(i).getCoordenadaX(), centros.get(i).getCoordenadaY(),
+                                                              6.0 * Math.PI / 4.0);
+                plotGen.addAnnotation(pointer);            
+        }
+        System.out.println(clientes.size());
+        for(int i=0;i<clientes.size();i++){
+            XYTextAnnotation texCliente = new XYTextAnnotation(""+i,
+                    clientes.get(i).getCoordenadaX(), clientes.get(i).getCoordenadaY());
+            plotGen.addAnnotation(texCliente);
+        }
+        XYLineAndShapeRenderer rendererGen = new XYLineAndShapeRenderer();
+        for(int i=0;i<solGenSeries.getSeries().size();i++){ // pintamos
+            rendererGen.setSeriesPaint(i, new java.awt.Color((float)Math.random() //color aleatorio
+                    , (float)Math.random(), (float)Math.random()));
+//            rendererGen.setSeriesPaint(i,java.awt.Color.RED);
+            rendererGen.setSeriesStroke(i, new BasicStroke(1.0f));
+        }
+        
+        plotGen.setRenderer(rendererGen);
+        ChartPanel panelGen = new ChartPanel(xylineChartGen);
+        panelGen.setPreferredSize(new Dimension(630, 520)); // ajusto tamaño
+        panelGen.setMouseWheelEnabled(true);
+        if(algoritmo==0){
+            panel_genetico.setLayout(new BorderLayout());
+            panel_genetico.add(panelGen, BorderLayout.NORTH);         
+        }
+        else{
+            panel_memetico.setLayout(new BorderLayout());
+            panel_memetico.add(panelGen, BorderLayout.NORTH);             
+        }
+        pack();
+    }
+    
     public void graficarSoluciones(Cromosoma gen, int algoritmo){
         XYSeriesCollection solGenSeries = new XYSeriesCollection();
         int numRuta=1;
@@ -340,14 +438,6 @@ public class Interface extends javax.swing.JFrame {
             if(gen.genes.get(i)>=nclientes){ // si es un almacen
                 //if(i>0) System.out.print("->T");// marcar fin de ruta
                 int nAlmacen=(gen.genes.get(i)-nclientes-1)/maxusos; // determinamos el almacen
-                //System.out.print("//T->A"+nAlmacen);
-                
-                
-//                XYPointerAnnotation pointer = new XYPointerAnnotation("Best Bid",
-//                        centros.get(nAlmacen).getCoordenadaX(), centros.get(nAlmacen).getCoordenadaY(),
-//                                                              3.0 * Math.PI / 4.0);
-                
-                
                 if(ruta!=null) solGenSeries.addSeries(ruta);
                  ruta = new XYSeries("ruta "+numRuta,false);
                  

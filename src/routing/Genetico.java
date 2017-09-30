@@ -110,14 +110,14 @@ public class Genetico {
         ArrayList<Cromosoma> poblacionNueva= new ArrayList<>(poblacion);
         
         double fitnessPromedio=0;
-        fitnessPromedio=evaluarMulti(poblacionNueva);
+//        fitnessPromedio=evaluarMulti(poblacionNueva);
         
-//        for(int i=0;i<=maxGeneraciones;i++){
-//            fitnessPromedio=evaluar(poblacionNueva);
-//            if(i==maxGeneraciones) break;
-//            //System.out.println("fitness promedio generacion "+i+" : "+fitnessPromedio);
-//            reproduccion(poblacionNueva,fitnessPromedio);    
-//        }
+        for(int i=0;i<=maxGeneraciones;i++){
+            fitnessPromedio=evaluarMulti(poblacionNueva);
+            if(i==maxGeneraciones) break;
+            System.out.println("fitness promedio generacion "+i+" : "+fitnessPromedio);
+            reproduccionMulti(poblacionNueva,fitnessPromedio);    
+        }
         
 //        Cromosoma hijo= crossover(poblacionNueva.get(10),poblacionNueva.get(15));
         Cromosoma mejorSolucion=obtenerMejor(poblacionNueva);
@@ -132,13 +132,13 @@ public class Genetico {
 //        imprimeRecorrido(poblacionNueva.get(10));
 //        imprimeRecorrido(poblacionNueva.get(15));
 
-        Cromosoma hijo=crossoverMulti(poblacionNueva.get(0),poblacionNueva.get(1));
-        imprimeRecorridoMulti(poblacionNueva.get(0));
-        System.out.println("==");
-        imprimeRecorridoMulti(poblacionNueva.get(1));
-        System.out.println("==");
-        imprimeRecorridoMulti(hijo);
-        System.out.println("==");        
+//        Cromosoma hijo=crossoverMulti(poblacionNueva.get(0),poblacionNueva.get(1));
+//        imprimeRecorridoMulti(poblacionNueva.get(0));
+//        System.out.println("==");
+//        imprimeRecorridoMulti(poblacionNueva.get(1));
+//        System.out.println("==");
+//        imprimeRecorridoMulti(hijo);
+//        System.out.println("==");        
         //double costo=costoSolucionMulti(mejorSolucion.genes);
         //System.out.println(costo);
         return mejorSolucion;
@@ -202,6 +202,54 @@ public class Genetico {
             poblacion.set(i, offspring.get(i));
         }
     }
+
+    public void reproduccionMulti(ArrayList<Cromosoma> poblacion,double fitnessPromedio){
+        int fitnessTotal=(int) Math.round(fitnessPromedio*poblacion.size());
+        //System.out.println(fitnessTotal);
+        ArrayList<Cromosoma> offspring= new ArrayList<>();
+        for(Cromosoma solucion :poblacion){
+            boolean abominacion=true;
+            Cromosoma hijo=new Cromosoma();
+            int n=0;
+            while(abominacion) { // seguir haciendo crossover hasta obtener una solución factible
+                Random semilla = new Random(); // seleccionar padre
+                Random semilla2 = new Random();// seleccionar madre
+                int pospadre=semilla.nextInt(fitnessTotal);
+                int posmadre=semilla2.nextInt(fitnessTotal);
+                //System.out.println(pospadre);
+                int encPadre=0,encMadre=0,sumafit=0; // simulamos ruleta de selecciones de padres
+                while(sumafit<=pospadre){
+                    sumafit+=poblacion.get(encPadre++).fitness;
+                }
+                sumafit=0;
+                while(sumafit<=posmadre){
+                    sumafit+=poblacion.get(encMadre++).fitness;
+                }         
+                encPadre--;
+                encMadre--;
+                Cromosoma padre=poblacion.get(encPadre);
+                Cromosoma madre=poblacion.get(encMadre);                
+                hijo= crossoverMulti(padre,madre);
+                //hijo.print();
+                
+                abominacion=!verificarMulti(hijo.genes);
+//                if(!abominacion){ // comprobar que hijo es mejor que padres
+//                    if(costoSolucion(hijo.genes)>costoSolucion(padre.genes) &&
+//                            costoSolucion(hijo.genes)>costoSolucion(madre.genes))
+//                        abominacion=true; // si es peor q padre y madre sigue siendo abominacion
+//                }
+                //imprimeRecorrido(hijo);
+                //System.out.println("intento "+n);
+                n++;
+            }
+            //if(Math.random()<=probMutacion) mutacionMulti(hijo); // solo si da dentro de la probabilidad de mutar, muta
+            offspring.add(hijo);
+        }
+        //copiar nueva  generacion a poblacion
+        for(int i=0;i<offspring.size();i++){
+            poblacion.set(i, offspring.get(i));
+        }
+    }
     
     public void mutacion(Cromosoma hijo){
         Random clientRandom1 = new Random();
@@ -219,6 +267,24 @@ public class Genetico {
             }
         }
     }
+    
+        public void mutacionMulti(Cromosoma hijo){
+        Random clientRandom1 = new Random();
+        Random clientRandom2 = new Random();
+        int clien1 = clientRandom1.nextInt(hijo.genes.size());
+        int clien2 = clientRandom2.nextInt(hijo.genes.size());
+        if(hijo.genes.get(clien1)<nclientes && hijo.genes.get(clien2)<nclientes){
+            int auxclien1=hijo.genes.get(clien1);
+            int auxclien2=hijo.genes.get(clien2);
+            hijo.genes.set(clien1,auxclien2 ); // hacemos intercambio
+            hijo.genes.set(clien2, auxclien1);
+            if(!verificarMulti(hijo.genes)){ // si es abominacion se revierte la mutacion
+                hijo.genes.set(clien1, auxclien1); // hacemos intercambio
+                hijo.genes.set(clien2, auxclien2);                
+            }
+        }
+    }
+        
     public Cromosoma crossover(Cromosoma padre, Cromosoma madre){
         Cromosoma hijo=new Cromosoma(); // inicializo con la madre
         ArrayList<ArrayList<Integer>> rutasPadre= obtenerRutas(padre);
@@ -286,7 +352,6 @@ public class Genetico {
                                 costoMin=costo;
                                 indMin=h;
                             }
-
                         }
                         genes.remove(h);                        
                     }
@@ -294,8 +359,7 @@ public class Genetico {
                 genes.add(indMin,rutaRandom.get(j));                
             }
 
-        }
-        System.out.println();        
+        }       
         hijo.genes=(ArrayList<Integer>)genes.clone();
         hijo.genes=limpiarCromosomaMulti(hijo);
         return hijo;
