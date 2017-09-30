@@ -7,7 +7,9 @@ package routing;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 /**
  *
@@ -27,6 +29,7 @@ public class Memetico {
     private double porcConvergencia=0.98;
     private double porcPreservacion=0.6;
     private int maxIntentos=4;
+    public int ncentros=0;
     public ArrayList<Cromosoma> poblacion= new ArrayList<>();
     public ArrayList<Cliente> almacenes = new ArrayList<>();
     public ArrayList<Cliente> clientes = new ArrayList<>();
@@ -52,6 +55,8 @@ public class Memetico {
         this.porcConvergencia=(double)porcCon/100;
         this.porcPreservacion=(double)porcPre/100;
         this.MAXFIT=clientes.size()*22000;
+        ncentros=centros.size();
+        nclientes=clientes.size();
     }    
     public void inicializarNodos(ArrayList<Cliente> clientes){
         nodos=new ArrayList<>(clientes);
@@ -60,6 +65,362 @@ public class Memetico {
             nodos.add(almacenes.get(nroAlmacen));
             if(i%maxUsosAlmacen==0) nroAlmacen++;
         }        
+    }
+    
+    public void inicializarNodosMulti(ArrayList<Cliente> clientes){
+        nodos=new ArrayList<>(clientes);
+        int nroAlmacen=0;
+        for(int i=0;i<almacenes.size();i++){ //inicializamos nodos con clientes y almacenes
+            nodos.add(almacenes.get(i));
+        }        
+    }   
+
+    public Cromosoma ejecutarMulti(){
+        
+        inicializarNodosMulti(clientes); // se juntan tanto clientes como depositos
+        inicializarPoblacionMulti();
+        ArrayList<Cromosoma> poblacionNueva= new ArrayList<>(poblacion);
+        
+        double fitnessPromedio=0;
+//        fitnessPromedio=evaluarMulti(poblacionNueva);
+        double fitnessAnterior=0;
+        for(int i=0;i<=maxGeneraciones;i++){
+            fitnessPromedio=evaluarMulti(poblacionNueva);
+            if(i==maxGeneraciones) break;
+            if(fitnessAnterior/fitnessPromedio>porcConvergencia){
+                reiniciarPoblacionMulti(poblacionNueva);
+                fitnessPromedio=evaluar(poblacionNueva);
+                fitnessAnterior=fitnessPromedio;
+            }
+            //System.out.println("fitness promedio generacion "+i+" : "+fitnessPromedio);
+            reproduccionMulti(poblacionNueva,fitnessPromedio);    
+        }
+        
+//        Cromosoma hijo= crossover(poblacionNueva.get(10),poblacionNueva.get(15));
+        Cromosoma mejorSolucion=obtenerMejor(poblacionNueva);
+//        mejorSolucion.print();
+//        ArrayList<ArrayList<Integer>> arr= obtenerRutas(mejorSolucion);
+//        for(int i=0;i<arr.size();i++){
+//            for(int j=0;j<arr.get(i).size();j++){
+//                System.out.print(arr.get(i).get(j)+"-");
+//            }
+//            System.out.println();
+//        }
+//        imprimeRecorrido(poblacionNueva.get(10));
+//        imprimeRecorrido(poblacionNueva.get(15));
+
+//        Cromosoma hijo=crossoverMulti(poblacionNueva.get(0),poblacionNueva.get(1));
+//        imprimeRecorridoMulti(poblacionNueva.get(0));
+//        System.out.println("==");
+//        imprimeRecorridoMulti(poblacionNueva.get(1));
+//        System.out.println("==");
+//        imprimeRecorridoMulti(hijo);
+//        System.out.println("==");        
+        //double costo=costoSolucionMulti(mejorSolucion.genes);
+        //System.out.println(costo);
+        return mejorSolucion;
+    }    
+
+    public double evaluarMulti(ArrayList<Cromosoma> poblacion){
+        int fitnessTotal=0;
+
+        for(Cromosoma solucion : poblacion) {
+            double costoSol=costoSolucionMulti(solucion.genes);
+            solucion.costo=costoSol;
+            solucion.fitness=MAXFIT-costoSol; // debido a que se escogera según su fitness , invertimos costo
+            //System.out.println(costoSolucion(solucion.genes));
+            
+            fitnessTotal+=solucion.fitness;
+        }
+        //System.out.println(fitnessTotal);
+        return fitnessTotal/poblacion.size();
+    }  
+
+    public double costoSolucionMulti(ArrayList<Integer> solucionPura){
+        ArrayList<ArrayList<Integer>> rutas=obtenerRutasMulti(solucionPura);
+        double costo=0;          
+        for(ArrayList<Integer> ruta : rutas){
+            int cargaTotal=0;
+            ArrayList<Integer> cargas=new ArrayList<>(Collections.nCopies(ncentros, 0));// inicializamos cargas x tipo 
+            costo+=dist(nodos.get(ruta.get(ruta.size()-1)),terminal)*consumoBase; // desde terminal al ultimo cliente
+            for(int i=ruta.size()-2;i>0;i--){ // leo al reves porque es más facil calcular la carga asi
+                Cliente nodo=nodos.get(ruta.get(i));
+                Cliente nodoSig=nodos.get(ruta.get(i-1));
+                if(ruta.get(i)<nclientes){ // si es un cliente
+                    cargaTotal+=nodo.getDemanda();
+                    cargas.set(nodo.getTipoProducto(), nodo.getDemanda()+cargas.get(nodo.getTipoProducto())); // registramos cuanto y de q tipo
+                    costo+=dist(nodo,nodoSig)*
+                        (consumoBase+(consumoLleno-consumoBase)*cargaTotal/capvehiculo);
+                }
+                else{ // si es un centro
+                    int nCentro=ruta.get(i)-nclientes; //restamos lo del centro segun su tipo
+                    cargaTotal-=cargas.get(nCentro);  // seria como una descarga
+                    costo+=dist(nodo,nodoSig)*
+                        (consumoBase+(consumoLleno-consumoBase)*cargaTotal/capvehiculo);                    
+                }
+            }
+            costo+=dist(nodos.get(ruta.get(0)),terminal)*consumoBase; // desde terminal al primer centro
+        }
+        return costo;
+    }
+    
+    public void reproduccionMulti(ArrayList<Cromosoma> poblacion,double fitnessPromedio){
+        int fitnessTotal=(int) Math.round(fitnessPromedio*poblacion.size());
+        //System.out.println(fitnessTotal);
+        ArrayList<Cromosoma> offspring= new ArrayList<>();
+        for(Cromosoma solucion :poblacion){
+            boolean abominacion=true;
+            Cromosoma hijo=new Cromosoma();
+            int n=0;
+            while(abominacion) { // seguir haciendo crossover hasta obtener una solución factible
+                Random semilla = new Random(); // seleccionar padre
+                Random semilla2 = new Random();// seleccionar madre
+                int pospadre=semilla.nextInt(fitnessTotal);
+                int posmadre=semilla2.nextInt(fitnessTotal);
+                //System.out.println(pospadre);
+                int encPadre=0,encMadre=0,sumafit=0; // simulamos ruleta de selecciones de padres
+                while(sumafit<=pospadre){
+                    sumafit+=poblacion.get(encPadre++).fitness;
+                }
+                sumafit=0;
+                while(sumafit<=posmadre){
+                    sumafit+=poblacion.get(encMadre++).fitness;
+                }         
+                encPadre--;
+                encMadre--;
+                Cromosoma padre=poblacion.get(encPadre);
+                Cromosoma madre=poblacion.get(encMadre);                
+                hijo= crossoverMulti(padre,madre);
+                //hijo.print();
+                
+                abominacion=!verificarMulti(hijo.genes);
+//                if(!abominacion){ // comprobar que hijo es mejor que padres
+//                    if(costoSolucion(hijo.genes)>costoSolucion(padre.genes) &&
+//                            costoSolucion(hijo.genes)>costoSolucion(madre.genes))
+//                        abominacion=true; // si es peor q padre y madre sigue siendo abominacion
+//                }
+                //imprimeRecorrido(hijo);
+                //System.out.println("intento "+n);
+                n++;
+            }
+            //if(Math.random()<=probMutacion) mutacionMulti(hijo); // solo si da dentro de la probabilidad de mutar, muta
+            offspring.add(hijo);
+        }
+        //copiar nueva  generacion a poblacion
+        for(int i=0;i<offspring.size();i++){
+            poblacion.set(i, offspring.get(i));
+        }
+    }
+    public Cromosoma crossoverMulti(Cromosoma padre, Cromosoma madre){
+        Cromosoma hijo=new Cromosoma(); // inicializo con la madre
+        ArrayList<ArrayList<Integer>> rutasMadre= obtenerRutasMulti(madre.genes);
+        Random ran=new Random();
+        ArrayList<Integer> rutaRandom=rutasMadre.get(ran.nextInt(rutasMadre.size())); // obtengo ruta random de madre
+        ArrayList<Integer> genes=(ArrayList<Integer>)padre.genes.clone();
+        for(int i=0;i<rutaRandom.size();i++){ // elimino los clientes
+            int indEliminar=genes.indexOf(rutaRandom.get(i));
+            boolean eliCentros=false;
+            if(rutaRandom.get(i)<nclientes){
+                if(genes.get(indEliminar-1)>=nclientes && ((indEliminar==genes.size()-1)|| 
+                        genes.get(indEliminar+1)>=nclientes )){ // si es una ruta q se queda sin clientes
+                    eliCentros=true;
+                }
+                genes.remove(indEliminar);
+                indEliminar--;
+                if(eliCentros){
+                    while(indEliminar>=0 && genes.get(indEliminar)>=nclientes)
+                        genes.remove(indEliminar--);
+                }
+            }    
+        }
+        for(int j=0;j<rutaRandom.size();j++){ //inserto evluando costos 
+            if(rutaRandom.get(j)<nclientes){
+                double costoMin=100000000;
+                int indMin=0;
+                for(int h=0;h<genes.size();h++){ // 
+                    if(genes.get(h)<nclientes){
+                        genes.add(h,rutaRandom.get(j));
+                        if(verificarMulti(genes)){ // si es factible
+                            double costo=costoSolucionMulti(genes);
+                            if(costo<costoMin){
+                                costoMin=costo;
+                                indMin=h;
+                            }
+                        }
+                        genes.remove(h);                        
+                    }
+                }
+                genes.add(indMin,rutaRandom.get(j));                
+            }
+
+        }       
+        hijo.genes=(ArrayList<Integer>)genes.clone();
+        hijo.genes=limpiarCromosomaMulti(hijo);
+        return hijo;
+    }
+
+    public ArrayList<Integer> limpiarCromosomaMulti(Cromosoma sol){
+        ArrayList<Integer> limpio= new ArrayList<>();
+        int n=sol.genes.size()-1;
+        while(n>=0){
+            Set<Integer> setTipos= new HashSet<>();
+            boolean tieneClientes=false;
+            while(n>=0 && sol.genes.get(n)<nclientes){ // mientras sea un cliente
+                limpio.add(sol.genes.get(n));
+                setTipos.add(nodos.get(sol.genes.get(n)).getTipoProducto()); // registramos que tipo de producto requiere
+                n--;
+                tieneClientes=true;
+            }
+            // agregamos solo los centros que son necesarios
+            int indComienzo=limpio.size();
+            while(n>=0 && sol.genes.get(n)>=nclientes){
+                if(tieneClientes && setTipos.contains(nodos.get(sol.genes.get(n)).getTipoProducto()))
+                    if(!limpio.subList(indComienzo,limpio.size()).contains(sol.genes.get(n))) limpio.add(sol.genes.get(n));
+                n--;
+            }
+        }
+        Collections.reverse(limpio);
+        return limpio;
+    }
+    
+    public boolean verificarMulti(ArrayList<Integer> genes){
+        ArrayList<ArrayList<Integer>> rutas=obtenerRutasMulti(genes);
+        for(ArrayList<Integer> ruta : rutas){
+            ArrayList<Integer> tiposenRuta= new ArrayList<>();
+            int i=0;
+            while(ruta.get(i)>=nclientes){ // mientras sea un centro
+                tiposenRuta.add(nodos.get(ruta.get(i)).getTipoProducto());
+                i++;
+            }
+            int carga=0;
+            while(i<ruta.size()){
+                if(carga+nodos.get(ruta.get(i)).getDemanda()>capvehiculo) return false;
+                if(!tiposenRuta.contains(nodos.get(ruta.get(i)).getTipoProducto())) return false;
+                carga+=nodos.get(ruta.get(i)).getDemanda();
+                i++;
+            }
+        }
+        return true;
+    }
+
+    public void imprimeRecorridoMulti(Cromosoma sol){
+        ArrayList<ArrayList<Integer>> rutas =obtenerRutasMulti(sol.genes);
+        for(ArrayList<Integer> ruta : rutas){
+            int i=0;
+            System.out.print("//T->");            
+            while(i<ruta.size()&& ruta.get(i)>=nclientes){// mientras sea un centro
+                int nAlmacen=ruta.get(i)-nclientes; // determinamos el almacen
+                System.out.print("A"+nAlmacen+"->");  
+                i++;
+            }
+            while(i<ruta.size()&& ruta.get(i)<nclientes){// mientras sea un cliente
+                System.out.print(ruta.get(i)+"->");
+                i++;
+            }
+            System.out.println("T");
+        }     
+    }  
+
+    public ArrayList<ArrayList<Integer>> obtenerRutasMulti(ArrayList<Integer> genes){
+        //ArrayList<Integer>solPura=limpiarCromosoma(sol);
+        ArrayList<ArrayList<Integer>> rutas= new ArrayList<>();
+        int i=0;
+        while(i<genes.size()){
+            ArrayList<Integer> ruta= new ArrayList<>();
+            while(i<genes.size()&& genes.get(i)>=nclientes){// mientras sea un centro
+                ruta.add(genes.get(i));
+                i++;
+            }
+            while(i<genes.size()&& genes.get(i)<nclientes){// mientras sea un cliente
+                ruta.add(genes.get(i));
+                i++;
+            }
+            rutas.add(ruta);
+        }
+        return rutas;
+    }
+    
+    public void inicializarPoblacionMulti(){
+        
+        
+        //for(int j=0;j<tamCrom;j++) origen.genes.add(j);
+        for(int j=0;j<maxPoblacion;j++){// generar maxpoblacion soluciones
+            int clientesTomados=0;
+            ArrayList<Cliente> clientesCopy= new ArrayList<>(clientes);
+            Collections.shuffle(clientesCopy);
+            Cromosoma origen= new Cromosoma();
+            while(clientesTomados<nclientes){ // mientras haya clientes sin asignar ruta
+                Set<Integer> setTipos= new HashSet<>();
+                int carga=0;
+                // agregar todos los clientes que pueda
+                int indiceCliente=0;
+                while(indiceCliente<clientesCopy.size()){
+                    if((clientesCopy.get(indiceCliente).getDemanda()+carga>capvehiculo)) break; // ya se llenó el vehículo
+                    origen.genes.add(clientesCopy.get(indiceCliente).getId()); // se agrega
+                    carga+=clientesCopy.get(indiceCliente).getDemanda();
+                    clientesTomados++;
+                    setTipos.add(clientesCopy.get(indiceCliente).getTipoProducto());
+                    clientesCopy.remove((int) indiceCliente); // remuevo al cliente que ya fue asignado
+                    indiceCliente++;
+                    Random rand =new Random();
+                    if(rand.nextFloat()<0.05*indiceCliente) break; // probabilida para no generar rutas tan llenas
+                }
+                int indStart=origen.genes.size();
+                //agregamos los centros necesarios para esos clientes
+                for(int i=0;i<ncentros;i++){
+                    if(setTipos.contains(almacenes.get(i).getTipoProducto())) 
+                        origen.genes.add(almacenes.get(i).getId());
+                }
+                Collections.shuffle(origen.genes.subList(indStart, origen.genes.size()));
+            }
+//            System.out.println("solucion encontrada "+j);
+            Collections.reverse(origen.genes);
+            Cromosoma mejorado=busquedaLocalMulti(origen);
+            poblacion.add(mejorado); // agregamos solución a la poblacion
+//            ArrayList<Integer> limpio=limpiarCromosoma(origen);
+//            origen.print();
+//            for(int i=0;i<limpio.size();i++)
+//                System.out.print(limpio.get(i)+"-");
+//            System.out.println();
+//            System.out.println(costoSolucion(limpio));
+            //origen.print();
+            
+        }        
+    }
+    
+    public Cromosoma randomizarSolucion(){
+        int clientesTomados=0;
+        ArrayList<Cliente> clientesCopy= new ArrayList<>(clientes);
+        Collections.shuffle(clientesCopy);
+        Cromosoma origen= new Cromosoma();        
+        while(clientesTomados<nclientes){ // mientras haya clientes sin asignar ruta
+             Set<Integer> setTipos= new HashSet<>();
+             int carga=0;
+             // agregar todos los clientes que pueda
+             int indiceCliente=0;
+             while(indiceCliente<clientesCopy.size()){
+                 if((clientesCopy.get(indiceCliente).getDemanda()+carga>capvehiculo)) break; // ya se llenó el vehículo
+                 origen.genes.add(clientesCopy.get(indiceCliente).getId()); // se agrega
+                 carga+=clientesCopy.get(indiceCliente).getDemanda();
+                 clientesTomados++;
+                 setTipos.add(clientesCopy.get(indiceCliente).getTipoProducto());
+                 clientesCopy.remove((int) indiceCliente); // remuevo al cliente que ya fue asignado
+                 indiceCliente++;
+                 Random rand =new Random();
+                 if(rand.nextFloat()<0.05*indiceCliente) break; // probabilida para no generar rutas tan llenas
+             }
+             int indStart=origen.genes.size();
+             //agregamos los centros necesarios para esos clientes
+             for(int i=0;i<ncentros;i++){
+                 if(setTipos.contains(almacenes.get(i).getTipoProducto())) 
+                     origen.genes.add(almacenes.get(i).getId());
+             }
+             Collections.shuffle(origen.genes.subList(indStart, origen.genes.size()));
+         }
+//            System.out.println("solucion encontrada "+j);
+         Collections.reverse(origen.genes);
+        Cromosoma mejorado=busquedaLocalMulti(origen);        
+         return mejorado;
     }
     public Cromosoma ejecutar(){
         nclientes=clientes.size();
@@ -116,6 +477,21 @@ public class Memetico {
             poblacion.set(i, mejorado);
         }
     }
+    
+    public void reiniciarPoblacionMulti(ArrayList<Cromosoma> poblacion){
+        int nroPreservados=(int) (poblacion.size()*porcPreservacion);
+        for(int i=nroPreservados;i<poblacion.size();i++){ // alteramos
+            boolean abominacion=true;
+            Cromosoma solnueva=null;
+            while(abominacion){
+                solnueva=randomizarSolucion();
+                abominacion=!verificarMulti(solnueva.genes);
+            }
+            Cromosoma mejorado=busquedaLocalMulti(solnueva);
+            poblacion.set(i, mejorado);
+        }
+    }
+    
     public Cromosoma  obtenerMejor(ArrayList<Cromosoma> poblacion){
         double fitMax=0;
         int imax=0;
@@ -357,6 +733,50 @@ public class Memetico {
         return mejorado;
     }
     
+    public Cromosoma busquedaLocalMulti(Cromosoma individuo){
+        Cromosoma mejorado= new Cromosoma(individuo);
+        int intentosExt=0;
+        double mejorFitness=MAXFIT-costoSolucionMulti(individuo.genes);
+        ArrayList<ArrayList<Integer>> rutas=obtenerRutasMulti(individuo.genes);
+        ArrayList<Integer> randoms =new ArrayList<>();
+        for(int i=0;i<rutas.size();i++) randoms.add(i);
+        while(intentosExt<maxIntentos){
+            Collections.shuffle(randoms);
+            ArrayList<Integer> ruta1=rutas.get(randoms.get(0));
+            ArrayList<Integer> ruta2=rutas.get(randoms.get(rutas.size()-1));
+            boolean mejora=false;
+            int minDemanda1=0,maxDemanda1=0,totalDemanda1=0,minDemanda2=0,maxDemanda2=0,totalDemanda2=0;
+            totalDemanda1=demandaRuta(ruta1,minDemanda1,maxDemanda1);
+            totalDemanda2=demandaRuta(ruta2,minDemanda2,maxDemanda2);           
+            if(minDemanda1-maxDemanda2+totalDemanda2<=capvehiculo && 
+                    minDemanda2-maxDemanda1+totalDemanda1<=capvehiculo){
+                int intentosInt=0;
+                while(intentosInt<maxIntentos){
+                    Random rand= new Random();
+                    Random rand2= new Random();
+                    int startCliente1=0;
+                    while(ruta1.get(startCliente1)>=nclientes) startCliente1++;
+                    int startCliente2=0;
+                    while(ruta2.get(startCliente2)>=nclientes) startCliente2++;                    
+                    int indcliente1=individuo.genes.indexOf(ruta1.get(rand.nextInt(ruta1.size()-startCliente1)+startCliente1));// para que no coja el primero(alamcen)
+                    int indcliente2=individuo.genes.indexOf(ruta2.get(rand2.nextInt(ruta2.size()-startCliente2)+startCliente2));// para que no coja el primero(alamcen)
+                    Collections.swap(individuo.genes,indcliente1,indcliente2);// intercambiamos
+                    double fitness=MAXFIT-costoSolucionMulti(individuo.genes);
+                    if(fitness>mejorFitness && verificarMulti(individuo.genes)){
+                        mejorFitness=fitness;
+                        mejorado.genes=(ArrayList<Integer>)individuo.genes.clone();
+                        mejorado.fitness=mejorFitness;
+                        intentosInt=0;
+                        mejora=true;
+                    }
+                    else intentosInt++;
+                }
+            }
+            if(mejora) intentosExt=0;
+            else intentosExt++;
+        }
+        return mejorado;
+    }
     
     public int demandaRuta(ArrayList<Integer> ruta,int minDemanda,int maxDemanda){
         int max=0;

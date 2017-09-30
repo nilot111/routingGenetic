@@ -20,6 +20,8 @@ import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -47,7 +49,10 @@ public class Interface extends javax.swing.JFrame {
     public int nclientes=0;
     public int nCentros=0;
     public int maxusos=10;
+    public int serieGen=-1;
+    public int serieMem=-1;
     public boolean mostrarTodos=true;
+    public boolean mostrarTodosMem=true;
     XYPlot plotGenetico=null;
     XYPlot plotMem=null;
     public Interface() {
@@ -110,6 +115,9 @@ public class Interface extends javax.swing.JFrame {
         genroute = new javax.swing.JSpinner();
         jButton2 = new javax.swing.JButton();
         panel_memetico = new javax.swing.JPanel();
+        jLabel22 = new javax.swing.JLabel();
+        memroute = new javax.swing.JSpinner();
+        jButton4 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setSize(new java.awt.Dimension(1200, 1200));
@@ -250,6 +258,11 @@ public class Interface extends javax.swing.JFrame {
         jLabel21.setText("Ruta: ");
 
         genroute.setValue(1);
+        genroute.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                genrouteStateChanged(evt);
+            }
+        });
 
         jButton2.setText("Seleccionar/ Mostrar todos");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -285,15 +298,45 @@ public class Interface extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Algoritmo Genético", panel_genetico);
 
+        jLabel22.setText("Ruta: ");
+
+        memroute.setValue(1);
+        memroute.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                memrouteStateChanged(evt);
+            }
+        });
+
+        jButton4.setText("Seleccionar/ Mostrar todos");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panel_memeticoLayout = new javax.swing.GroupLayout(panel_memetico);
         panel_memetico.setLayout(panel_memeticoLayout);
         panel_memeticoLayout.setHorizontalGroup(
             panel_memeticoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 645, Short.MAX_VALUE)
+            .addGroup(panel_memeticoLayout.createSequentialGroup()
+                .addGap(176, 176, 176)
+                .addComponent(jLabel22)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(memroute, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(27, 27, 27)
+                .addComponent(jButton4)
+                .addContainerGap(196, Short.MAX_VALUE))
         );
         panel_memeticoLayout.setVerticalGroup(
             panel_memeticoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 562, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_memeticoLayout.createSequentialGroup()
+                .addContainerGap(528, Short.MAX_VALUE)
+                .addGroup(panel_memeticoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_memeticoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel22)
+                        .addComponent(memroute, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jButton4, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addContainerGap())
         );
 
         jTabbedPane1.addTab("Algoritmo Memético", panel_memetico);
@@ -317,15 +360,15 @@ public class Interface extends javax.swing.JFrame {
                 ,consumoB,consumoM,capV);        
         Cromosoma mejor1=genAlgoritmo.ejecutarMulti();
         
-//        int porcCon=(int)porcConvergencia.getValue();
-//        int porcPre=(int)porcPreservacion.getValue();
-//        Memetico memAlgoritmo= new Memetico(clientes,centros,maxp,maxg,probMut
-//                ,consumoB,consumoM,capV,porcCon,porcPre);
-//        Cromosoma mejor2=memAlgoritmo.ejecutar();
+        int porcCon=(int)porcConvergencia.getValue();
+        int porcPre=(int)porcPreservacion.getValue();
+        Memetico memAlgoritmo= new Memetico(clientes,centros,maxp,maxg,probMut
+                ,consumoB,consumoM,capV,porcCon,porcPre);
+        Cromosoma mejor2=memAlgoritmo.ejecutarMulti();
         graficarSolucionesMulti(mejor1,0);
-//        graficarSoluciones(mejor2,1);
+        graficarSolucionesMulti(mejor2,1);
         mostrarResultadosMulti(mejor1,0);
-//        mostrarResultados(mejor2,1);
+        mostrarResultadosMulti(mejor2,1);
     }//GEN-LAST:event_jButton3ActionPerformed
     
     public void mostrarResultados(Cromosoma sol,int numAlgoritmo){
@@ -449,12 +492,16 @@ public class Interface extends javax.swing.JFrame {
         if(algoritmo==0){
             plotGenetico=plotGen;
             panel_genetico.setLayout(new BorderLayout());
-            panel_genetico.add(panelGen, BorderLayout.NORTH);         
+            panel_genetico.add(panelGen, BorderLayout.NORTH);
+            SpinnerModel smm = new SpinnerNumberModel(1,1, plotGenetico.getSeriesCount(), 1);
+            genroute.setModel(smm);            
         }
         else{
             plotMem=plotGen;
             panel_memetico.setLayout(new BorderLayout());
-            panel_memetico.add(panelGen, BorderLayout.NORTH);             
+            panel_memetico.add(panelGen, BorderLayout.NORTH);
+            SpinnerModel sm = new SpinnerNumberModel(1,1, plotMem.getSeriesCount(), 1);
+            memroute.setModel(sm);
         }
         pack();
         
@@ -591,6 +638,7 @@ public class Interface extends javax.swing.JFrame {
             for(int i=0;i<plotGenetico.getSeriesCount();i++){
                 if(i!=numRuta) plotGenetico.getRenderer().setSeriesVisible(i,false);
             }
+            serieGen=numRuta;
         }
         else{
             for(int i=0;i<plotGenetico.getSeriesCount();i++)
@@ -598,6 +646,58 @@ public class Interface extends javax.swing.JFrame {
         }
         mostrarTodos=!mostrarTodos;
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        // TODO add your handling code here:
+        int numRuta=(int)memroute.getValue()-1;
+        if(mostrarTodosMem){
+            for(int i=0;i<plotMem.getSeriesCount();i++){
+                if(i!=numRuta) plotMem.getRenderer().setSeriesVisible(i,false);
+            }
+            serieMem=numRuta;
+        }
+        else{
+            for(int i=0;i<plotMem.getSeriesCount();i++)
+                plotMem.getRenderer().setSeriesVisible(i,true);
+        }
+        mostrarTodosMem=!mostrarTodosMem;        
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void genrouteStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_genrouteStateChanged
+        // TODO add your handling code here:
+        int numRuta=(int) genroute.getValue()-1;
+        if(mostrarTodos){
+            for(int i=0;i<plotGenetico.getSeriesCount();i++){
+                if(i!=numRuta) plotGenetico.getRenderer().setSeriesVisible(i,false);
+            }
+            serieGen=numRuta;
+            mostrarTodos=false;
+        }
+        else{
+            plotGenetico.getRenderer().setSeriesVisible(serieGen,false);
+            plotGenetico.getRenderer().setSeriesVisible(numRuta,true);
+            serieGen=numRuta;
+        }
+        
+    }//GEN-LAST:event_genrouteStateChanged
+
+    private void memrouteStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_memrouteStateChanged
+        // TODO add your handling code here:
+        int numRuta=(int) memroute.getValue()-1;
+        if(mostrarTodosMem){
+            for(int i=0;i<plotMem.getSeriesCount();i++){
+                if(i!=numRuta) plotMem.getRenderer().setSeriesVisible(i,false);
+            }
+            serieMem=numRuta;
+            mostrarTodosMem=false;   
+        }
+        else{
+            plotMem.getRenderer().setSeriesVisible(serieMem,false);
+            plotMem.getRenderer().setSeriesVisible(numRuta,true);
+            serieMem=numRuta;
+        }
+             
+    }//GEN-LAST:event_memrouteStateChanged
 
     /**
      * @param args the command line arguments
@@ -644,6 +744,7 @@ public class Interface extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -659,6 +760,7 @@ public class Interface extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
+    private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -673,6 +775,7 @@ public class Interface extends javax.swing.JFrame {
     private javax.swing.JSpinner maxPoblacion;
     private javax.swing.JTextField mem_costo;
     private javax.swing.JTextField mem_fit;
+    private javax.swing.JSpinner memroute;
     private javax.swing.JPanel panel_configuración;
     private javax.swing.JPanel panel_genetico;
     private javax.swing.JPanel panel_memetico;
