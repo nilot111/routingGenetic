@@ -473,7 +473,7 @@ public class Interface extends javax.swing.JFrame {
                 plotGen.addAnnotation(pointer);            
         }
         for(int i=0;i<clientes.size();i++){
-            XYTextAnnotation texCliente = new XYTextAnnotation(""+i,
+            XYTextAnnotation texCliente = new XYTextAnnotation(""+i+"("+clientes.get(i).getTipoProducto()+")",
                     clientes.get(i).getCoordenadaX(), clientes.get(i).getCoordenadaY());
             plotGen.addAnnotation(texCliente);
         }
