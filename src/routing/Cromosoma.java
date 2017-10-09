@@ -13,7 +13,7 @@ import java.util.ArrayList;
  */
 public class Cromosoma {
     public ArrayList<Integer> genes ;
-    public double fitness;
+    public int fitness;
     public double costo;
     
     public void print(){

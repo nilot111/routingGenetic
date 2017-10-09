@@ -24,11 +24,13 @@ public class Memetico {
     private int capvehiculo=10;
     private int numVehiculos=3;
     private int maxUsosAlmacen=10;
+    private int ngeneracion=0;
     private int nclientes=0;
     private int MAXFIT=110000;
     private double porcConvergencia=0.98;
     private double porcPreservacion=0.6;
     private int maxIntentos=4;
+    private double maxCosto=0;
     public int ncentros=0;
     public ArrayList<Cromosoma> poblacion= new ArrayList<>();
     public ArrayList<Cliente> almacenes = new ArrayList<>();
@@ -82,15 +84,16 @@ public class Memetico {
         ArrayList<Cromosoma> poblacionNueva= new ArrayList<>(poblacion);
         
         double fitnessPromedio=0;
+        double fitProm=0;
 //        fitnessPromedio=evaluarMulti(poblacionNueva);
         double fitnessAnterior=0;
         for(int i=0;i<=maxGeneraciones;i++){
-            fitnessPromedio=evaluarMulti(poblacionNueva);
+            fitnessPromedio=evaluarMulti(poblacionNueva,fitProm);
             if(i==maxGeneraciones) break;
-            if(fitnessAnterior/fitnessPromedio>porcConvergencia){
+            if(fitnessAnterior/fitProm>porcConvergencia){
                 reiniciarPoblacionMulti(poblacionNueva);
-                fitnessPromedio=evaluar(poblacionNueva);
-                fitnessAnterior=fitnessPromedio;
+                fitnessPromedio=evaluarMulti(poblacionNueva,fitProm);
+                fitnessAnterior=fitProm;
             }
             //System.out.println("fitness promedio generacion "+i+" : "+fitnessPromedio);
             reproduccionMulti(poblacionNueva,fitnessPromedio);    
@@ -121,17 +124,30 @@ public class Memetico {
         return mejorSolucion;
     }    
 
-    public double evaluarMulti(ArrayList<Cromosoma> poblacion){
+    public double evaluarMulti(ArrayList<Cromosoma> poblacion,double fitProm){
         int fitnessTotal=0;
-
+        int fitnesstotalF=0;
+        double costoMax=0,costoMin=1000000;
         for(Cromosoma solucion : poblacion) {
             double costoSol=costoSolucionMulti(solucion.genes);
+            if(costoMax<costoSol) costoMax=costoSol;
+            if(costoMin>costoSol) costoMin=costoSol;            
             solucion.costo=costoSol;
-            solucion.fitness=MAXFIT-costoSol; // debido a que se escogera según su fitness , invertimos costo
+            fitnesstotalF+=MAXFIT-costoSol;
+            //solucion.fitness=MAXFIT-costoSol; // debido a que se escogera según su fitness , invertimos costo
             //System.out.println(costoSolucion(solucion.genes));
-            
-            fitnessTotal+=solucion.fitness;
+
         }
+        fitProm=fitnesstotalF/poblacion.size();
+        for(Cromosoma solucion : poblacion) {
+            solucion.fitness=getFitnessNormal(solucion.costo,costoMax,costoMin); // debido a que se escogera según su fitness , invertimos costo
+            //System.out.println(costoSolucion(solucion.genes));
+            fitnessTotal+=solucion.fitness;
+            
+        } 
+        int fitnessPromedioF=(fitnesstotalF/poblacion.size())/10;
+        //System.out.println("fitness promedio generacion "+ngeneracion+" : "+fitnessPromedioF);
+        ngeneracion++;
         //System.out.println(fitnessTotal);
         return fitnessTotal/poblacion.size();
     }  
@@ -211,6 +227,15 @@ public class Memetico {
             poblacion.set(i, offspring.get(i));
         }
     }
+    
+    
+    public int getFitnessNormal(double costo, double max,double min){
+        double fitnessReal=1000-1000*(costo-min)/(max-min);
+        int fitness=(int) Math.round(fitnessReal);
+        return fitness;
+    }
+
+    
     public Cromosoma crossoverMulti(Cromosoma padre, Cromosoma madre){
         Cromosoma hijo=new Cromosoma(); // inicializo con la madre
         ArrayList<ArrayList<Integer>> rutasMadre= obtenerRutasMulti(madre.genes);
@@ -623,7 +648,7 @@ public class Memetico {
         for(Cromosoma solucion : poblacion) {
             double costoSol=costoSolucion(solucion.genes);
             solucion.costo=costoSol;
-            solucion.fitness=MAXFIT-costoSol; // debido a que se escogera según su fitness , invertimos costo
+            //solucion.fitness=MAXFIT-costoSol; // debido a que se escogera según su fitness , invertimos costo
             fitnessTotal+=solucion.fitness;
         }
         //System.out.println(fitnessTotal);
@@ -720,7 +745,7 @@ public class Memetico {
                     if(fitness>mejorFitness && verificar(individuo)){
                         mejorFitness=fitness;
                         mejorado.genes=(ArrayList<Integer>)individuo.genes.clone();
-                        mejorado.fitness=mejorFitness;
+                        mejorado.costo=mejorFitness;
                         intentosInt=0;
                         mejora=true;
                     }
@@ -736,7 +761,7 @@ public class Memetico {
     public Cromosoma busquedaLocalMulti(Cromosoma individuo){
         Cromosoma mejorado= new Cromosoma(individuo);
         int intentosExt=0;
-        double mejorFitness=MAXFIT-costoSolucionMulti(individuo.genes);
+        double menorCosto=costoSolucionMulti(individuo.genes);
         ArrayList<ArrayList<Integer>> rutas=obtenerRutasMulti(individuo.genes);
         ArrayList<Integer> randoms =new ArrayList<>();
         for(int i=0;i<rutas.size();i++) randoms.add(i);
@@ -761,11 +786,11 @@ public class Memetico {
                     int indcliente1=individuo.genes.indexOf(ruta1.get(rand.nextInt(ruta1.size()-startCliente1)+startCliente1));// para que no coja el primero(alamcen)
                     int indcliente2=individuo.genes.indexOf(ruta2.get(rand2.nextInt(ruta2.size()-startCliente2)+startCliente2));// para que no coja el primero(alamcen)
                     Collections.swap(individuo.genes,indcliente1,indcliente2);// intercambiamos
-                    double fitness=MAXFIT-costoSolucionMulti(individuo.genes);
-                    if(fitness>mejorFitness && verificarMulti(individuo.genes)){
-                        mejorFitness=fitness;
+                    double costo=costoSolucionMulti(individuo.genes);
+                    if(costo<menorCosto && verificarMulti(individuo.genes)){
+                        menorCosto=costo;
                         mejorado.genes=(ArrayList<Integer>)individuo.genes.clone();
-                        mejorado.fitness=mejorFitness;
+                        mejorado.costo=menorCosto;
                         intentosInt=0;
                         mejora=true;
                     }

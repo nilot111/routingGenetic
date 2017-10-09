@@ -136,7 +136,7 @@ public class Interface extends javax.swing.JFrame {
         });
         panel_configuración.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(547, 25, -1, -1));
 
-        text_clientes.setText("C:\\Users\\GUERRA\\Desktop\\Tesis 2\\Data\\test.txt");
+        text_clientes.setText("C:\\Users\\GUERRA\\Desktop\\Tesis 2\\Data\\p01.txt");
         text_clientes.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 text_clientesActionPerformed(evt);
@@ -182,13 +182,13 @@ public class Interface extends javax.swing.JFrame {
         jLabel3.setText("Porcentaje de convergencia:");
         panel_configuración.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(92, 215, -1, -1));
 
-        porcConvergencia.setValue(100);
+        porcConvergencia.setValue(90);
         panel_configuración.add(porcConvergencia, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 212, 63, -1));
 
         jLabel12.setText("Porcentaje de preservación:");
         panel_configuración.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(372, 215, -1, -1));
 
-        porcPreservacion.setValue(99);
+        porcPreservacion.setValue(90);
         panel_configuración.add(porcPreservacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(542, 212, 63, -1));
 
         jButton3.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
@@ -200,13 +200,13 @@ public class Interface extends javax.swing.JFrame {
         });
         panel_configuración.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 250, 131, 33));
 
-        maxPoblacion.setValue(300);
+        maxPoblacion.setValue(400);
         panel_configuración.add(maxPoblacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(542, 99, 63, -1));
 
-        porcMutacion.setValue(1);
+        porcMutacion.setValue(10);
         panel_configuración.add(porcMutacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(542, 151, 63, -1));
 
-        maxGeneraciones.setValue(30);
+        maxGeneraciones.setValue(75);
         panel_configuración.add(maxGeneraciones, new org.netbeans.lib.awtextra.AbsoluteConstraints(542, 125, 63, -1));
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
@@ -430,7 +430,7 @@ public class Interface extends javax.swing.JFrame {
             indRuta++;            
         }
         int costoT=(int)sol.costo;
-        int fitT=(int)sol.fitness;
+        int fitT=110000-(int)sol.costo;
         textCost.setText(""+costoT);
         textFit.setText(""+fitT);
         

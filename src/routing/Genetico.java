@@ -263,12 +263,19 @@ public class Genetico {
             hijo.genes.set(clien2, auxclien1);
             if(!verificar(hijo)){ // si es abominacion se revierte la mutacion
                 hijo.genes.set(clien1, auxclien1); // hacemos intercambio
-                hijo.genes.set(clien2, auxclien2);                
+                hijo.genes.set(clien2, auxclien2);
             }
         }
     }
     
-        public void mutacionMulti(Cromosoma hijo){
+    
+    public int getFitnessNormal(double costo, double max,double min){
+        double fitnessReal=1000-1000*(costo-min)/(max-min);
+        int fitness=(int) Math.round(fitnessReal);
+        return fitness;
+    }
+    
+    public void mutacionMulti(Cromosoma hijo){
         Random clientRandom1 = new Random();
         Random clientRandom2 = new Random();
         int clien1 = clientRandom1.nextInt(hijo.genes.size());
@@ -410,7 +417,7 @@ public class Genetico {
         for(Cromosoma solucion : poblacion) {
             double costoSol=costoSolucion(solucion.genes);
             solucion.costo=costoSol;
-            solucion.fitness=MAXFIT-costoSol; // debido a que se escogera según su fitness , invertimos costo
+           // solucion.fitness=MAXFIT-costoSol; // debido a que se escogera según su fitness , invertimos costo
             //System.out.println(costoSolucion(solucion.genes));
             
             fitnessTotal+=solucion.fitness;
@@ -421,15 +428,24 @@ public class Genetico {
     
     public double evaluarMulti(ArrayList<Cromosoma> poblacion){
         int fitnessTotal=0;
-
+        double costoMax=0,costoMin=1000000;
         for(Cromosoma solucion : poblacion) {
             double costoSol=costoSolucionMulti(solucion.genes);
+            if(costoMax<costoSol) costoMax=costoSol;
+            if(costoMin>costoSol) costoMin=costoSol;
             solucion.costo=costoSol;
-            solucion.fitness=MAXFIT-costoSol; // debido a que se escogera según su fitness , invertimos costo
+//            solucion.fitness=MAXFIT-costoSol; // debido a que se escogera según su fitness , invertimos costo
             //System.out.println(costoSolucion(solucion.genes));
             
             fitnessTotal+=solucion.fitness;
         }
+        
+        for(Cromosoma solucion : poblacion) {
+            solucion.fitness=getFitnessNormal(solucion.costo,costoMax,costoMin); // debido a que se escogera según su fitness , invertimos costo
+            //System.out.println(costoSolucion(solucion.genes));
+            
+            fitnessTotal+=solucion.fitness;
+        }        
         //System.out.println(fitnessTotal);
         return fitnessTotal/poblacion.size();
     }    
