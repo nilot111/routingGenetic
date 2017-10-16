@@ -242,7 +242,7 @@ public class Genetico {
                 //System.out.println("intento "+n);
                 n++;
             }
-            //if(Math.random()<=probMutacion) mutacionMulti(hijo); // solo si da dentro de la probabilidad de mutar, muta
+            if(Math.random()<=probMutacion) mutacionMulti(hijo); // solo si da dentro de la probabilidad de mutar, muta
             offspring.add(hijo);
         }
         //copiar nueva  generacion a poblacion

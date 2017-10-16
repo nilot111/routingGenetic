@@ -85,22 +85,32 @@ public class Memetico {
         
         double fitnessPromedio=0;
         double fitProm=0;
+        double costoMejorAnt=10000000;
 //        fitnessPromedio=evaluarMulti(poblacionNueva);
         double fitnessAnterior=0;
+        Cromosoma mejorFinal= new Cromosoma();
         for(int i=0;i<=maxGeneraciones;i++){
             fitnessPromedio=evaluarMulti(poblacionNueva,fitProm);
+            Cromosoma mejorSolucion=obtenerMejor(poblacionNueva);
+            if(mejorSolucion.costo<costoMejorAnt){
+                mejorFinal=mejorSolucion;
+                costoMejorAnt=mejorSolucion.costo;
+            }            
             if(i==maxGeneraciones) break;
             if(fitnessAnterior/fitProm>porcConvergencia){
                 reiniciarPoblacionMulti(poblacionNueva);
                 fitnessPromedio=evaluarMulti(poblacionNueva,fitProm);
                 fitnessAnterior=fitProm;
             }
+
             //System.out.println("fitness promedio generacion "+i+" : "+fitnessPromedio);
-            reproduccionMulti(poblacionNueva,fitnessPromedio);    
+            reproduccionMulti(poblacionNueva,fitnessPromedio);
+            
+            
         }
         
 //        Cromosoma hijo= crossover(poblacionNueva.get(10),poblacionNueva.get(15));
-        Cromosoma mejorSolucion=obtenerMejor(poblacionNueva);
+        //Cromosoma mejorSolucion=obtenerMejor(poblacionNueva);
 //        mejorSolucion.print();
 //        ArrayList<ArrayList<Integer>> arr= obtenerRutas(mejorSolucion);
 //        for(int i=0;i<arr.size();i++){
@@ -121,7 +131,7 @@ public class Memetico {
 //        System.out.println("==");        
         //double costo=costoSolucionMulti(mejorSolucion.genes);
         //System.out.println(costo);
-        return mejorSolucion;
+        return mejorFinal;
     }    
 
     public double evaluarMulti(ArrayList<Cromosoma> poblacion,double fitProm){
@@ -185,42 +195,48 @@ public class Memetico {
         //System.out.println(fitnessTotal);
         ArrayList<Cromosoma> offspring= new ArrayList<>();
         for(Cromosoma solucion :poblacion){
-            boolean abominacion=true;
-            Cromosoma hijo=new Cromosoma();
-            int n=0;
-            while(abominacion) { // seguir haciendo crossover hasta obtener una solución factible
-                Random semilla = new Random(); // seleccionar padre
-                Random semilla2 = new Random();// seleccionar madre
-                int pospadre=semilla.nextInt(fitnessTotal);
-                int posmadre=semilla2.nextInt(fitnessTotal);
-                //System.out.println(pospadre);
-                int encPadre=0,encMadre=0,sumafit=0; // simulamos ruleta de selecciones de padres
-                while(sumafit<=pospadre){
-                    sumafit+=poblacion.get(encPadre++).fitness;
+            if(Math.random()<=0.8){
+                boolean abominacion=true;
+                Cromosoma hijo=new Cromosoma();
+                int n=0;
+                while(abominacion) { // seguir haciendo crossover hasta obtener una solución factible
+                    Random semilla = new Random(); // seleccionar padre
+                    Random semilla2 = new Random();// seleccionar madre
+                    int pospadre=semilla.nextInt(fitnessTotal);
+                    int posmadre=semilla2.nextInt(fitnessTotal);
+                    //System.out.println(pospadre);
+                    int encPadre=0,encMadre=0,sumafit=0; // simulamos ruleta de selecciones de padres
+                    while(sumafit<=pospadre){
+                        sumafit+=poblacion.get(encPadre++).fitness;
+                    }
+                    sumafit=0;
+                    while(sumafit<=posmadre){
+                        sumafit+=poblacion.get(encMadre++).fitness;
+                    }         
+                    encPadre--;
+                    encMadre--;
+                    Cromosoma padre=poblacion.get(encPadre);
+                    Cromosoma madre=poblacion.get(encMadre);                
+                    hijo= crossoverMulti(padre,madre);
+                    //hijo.print();
+
+                    abominacion=!verificarMulti(hijo.genes);
+    //                if(!abominacion){ // comprobar que hijo es mejor que padres
+    //                    double costoHijo=costoSolucionMulti(hijo.genes);
+    //                    double costoPadre=costoSolucionMulti(padre.genes);
+    //                    double costoMadre=costoSolucionMulti(madre.genes);
+    //                    if(costoHijo>costoPadre &&
+    //                            costoHijo>costoMadre)
+    //                        abominacion=true; // si es peor q padre y madre sigue siendo abominacion
+    //                }
+                    //imprimeRecorrido(hijo);
+                    //System.out.println("intento "+n);
+                    n++;
                 }
-                sumafit=0;
-                while(sumafit<=posmadre){
-                    sumafit+=poblacion.get(encMadre++).fitness;
-                }         
-                encPadre--;
-                encMadre--;
-                Cromosoma padre=poblacion.get(encPadre);
-                Cromosoma madre=poblacion.get(encMadre);                
-                hijo= crossoverMulti(padre,madre);
-                //hijo.print();
-                
-                abominacion=!verificarMulti(hijo.genes);
-//                if(!abominacion){ // comprobar que hijo es mejor que padres
-//                    if(costoSolucion(hijo.genes)>costoSolucion(padre.genes) &&
-//                            costoSolucion(hijo.genes)>costoSolucion(madre.genes))
-//                        abominacion=true; // si es peor q padre y madre sigue siendo abominacion
-//                }
-                //imprimeRecorrido(hijo);
-                //System.out.println("intento "+n);
-                n++;
+                if(Math.random()<=probMutacion) mutacionMulti(hijo); // solo si da dentro de la probabilidad de mutar, muta
+                offspring.add(hijo);
             }
-            //if(Math.random()<=probMutacion) mutacionMulti(hijo); // solo si da dentro de la probabilidad de mutar, muta
-            offspring.add(hijo);
+            else offspring.add(solucion);
         }
         //copiar nueva  generacion a poblacion
         for(int i=0;i<offspring.size();i++){
@@ -228,6 +244,22 @@ public class Memetico {
         }
     }
     
+    public void mutacionMulti(Cromosoma hijo){
+        Random clientRandom1 = new Random();
+        Random clientRandom2 = new Random();
+        int clien1 = clientRandom1.nextInt(hijo.genes.size());
+        int clien2 = clientRandom2.nextInt(hijo.genes.size());
+        if(hijo.genes.get(clien1)<nclientes && hijo.genes.get(clien2)<nclientes){
+            int auxclien1=hijo.genes.get(clien1);
+            int auxclien2=hijo.genes.get(clien2);
+            hijo.genes.set(clien1,auxclien2 ); // hacemos intercambio
+            hijo.genes.set(clien2, auxclien1);
+            if(!verificarMulti(hijo.genes)){ // si es abominacion se revierte la mutacion
+                hijo.genes.set(clien1, auxclien1); // hacemos intercambio
+                hijo.genes.set(clien2, auxclien2);                
+            }
+        }
+    }
     
     public int getFitnessNormal(double costo, double max,double min){
         double fitnessReal=1000-1000*(costo-min)/(max-min);
@@ -519,14 +551,15 @@ public class Memetico {
     
     public Cromosoma  obtenerMejor(ArrayList<Cromosoma> poblacion){
         double fitMax=0;
-        int imax=0;
+        double costoMin=10000000;
+        int imin=0;
         for(int i=0;i<poblacion.size();i++){
-            if(poblacion.get(i).fitness>fitMax) {
-                fitMax=poblacion.get(i).fitness;
-                imax=i;
+            if(poblacion.get(i).costo<costoMin) {
+                costoMin=poblacion.get(i).costo;
+                imin=i;
             }
         }
-        return poblacion.get(imax);
+        return poblacion.get(imin);
     }
     public void reproduccion(ArrayList<Cromosoma> poblacion,double fitnessPromedio){
         int fitnessTotal=(int) Math.round(fitnessPromedio*poblacion.size());

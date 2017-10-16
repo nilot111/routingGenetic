@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -53,6 +54,7 @@ public class Interface extends javax.swing.JFrame {
     public int serieMem=-1;
     public boolean mostrarTodos=true;
     public boolean mostrarTodosMem=true;
+    public int capVehiculo=0;
     XYPlot plotGenetico=null;
     XYPlot plotMem=null;
     public Interface() {
@@ -136,13 +138,13 @@ public class Interface extends javax.swing.JFrame {
         });
         panel_configuración.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(547, 25, -1, -1));
 
-        text_clientes.setText("C:\\Users\\GUERRA\\Desktop\\Tesis 2\\Data\\p01.txt");
+        text_clientes.setText("C:\\Users\\GUERRA\\Desktop\\Tesis 2\\DataExp\\p02");
         text_clientes.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 text_clientesActionPerformed(evt);
             }
         });
-        panel_configuración.add(text_clientes, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 26, 437, -1));
+        panel_configuración.add(text_clientes, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 26, 437, 30));
 
         jLabel6.setText("Consumo de combustible base:");
         panel_configuración.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(79, 102, -1, -1));
@@ -182,7 +184,7 @@ public class Interface extends javax.swing.JFrame {
         jLabel3.setText("Porcentaje de convergencia:");
         panel_configuración.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(92, 215, -1, -1));
 
-        porcConvergencia.setValue(90);
+        porcConvergencia.setValue(85);
         panel_configuración.add(porcConvergencia, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 212, 63, -1));
 
         jLabel12.setText("Porcentaje de preservación:");
@@ -203,7 +205,7 @@ public class Interface extends javax.swing.JFrame {
         maxPoblacion.setValue(400);
         panel_configuración.add(maxPoblacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(542, 99, 63, -1));
 
-        porcMutacion.setValue(10);
+        porcMutacion.setValue(15);
         panel_configuración.add(porcMutacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(542, 151, 63, -1));
 
         maxGeneraciones.setValue(75);
@@ -348,10 +350,12 @@ public class Interface extends javax.swing.JFrame {
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
-        leerArchivo();
+        //leerArchivo();
+        leerArchivoReales();
         int maxp=(int)maxPoblacion.getValue();
         int maxg=(int)maxGeneraciones.getValue();
-        int capV=(int)capVehicular.getValue();
+        //int capV=(int)capVehicular.getValue();
+        int capV=capVehiculo;
         int consumoB=(int)consumoBase.getValue();
         int consumoM=(int)consumoMax.getValue();
         int probMut=(int)porcMutacion.getValue();
@@ -359,16 +363,20 @@ public class Interface extends javax.swing.JFrame {
         Genetico genAlgoritmo= new Genetico(clientes,centros,maxp,maxg,probMut
                 ,consumoB,consumoM,capV);        
         Cromosoma mejor1=genAlgoritmo.ejecutarMulti();
+        mostrarResultadosMulti(mejor1,0);
+        
         
         int porcCon=(int)porcConvergencia.getValue();
         int porcPre=(int)porcPreservacion.getValue();
         Memetico memAlgoritmo= new Memetico(clientes,centros,maxp,maxg,probMut
                 ,consumoB,consumoM,capV,porcCon,porcPre);
         Cromosoma mejor2=memAlgoritmo.ejecutarMulti();
-        graficarSolucionesMulti(mejor1,0);
-        graficarSolucionesMulti(mejor2,1);
-        mostrarResultadosMulti(mejor1,0);
         mostrarResultadosMulti(mejor2,1);
+        
+        
+        graficarSolucionesMulti(mejor2,1);
+        graficarSolucionesMulti(mejor1,0);
+        
     }//GEN-LAST:event_jButton3ActionPerformed
     
     public void mostrarResultados(Cromosoma sol,int numAlgoritmo){
@@ -572,6 +580,49 @@ public class Interface extends javax.swing.JFrame {
         }
         pack();
     }
+    public void leerArchivoReales(){
+        int n=0;
+        try (Scanner scanner = new Scanner(new FileReader(text_clientes.getText()))) {
+            scanner.useLocale(Locale.US);
+            while (scanner.hasNext()&& n<=(3+2*nCentros)) {
+                if (scanner.hasNextInt() ) {
+                    if(n==2) nclientes=scanner.nextInt();
+                    else if(n==3) nCentros=scanner.nextInt();
+                    else if(n==5) capVehiculo=scanner.nextInt();
+                    else scanner.nextInt();
+                } else {                   
+                    scanner.next();
+                }
+                n++;
+            }
+            n=0;
+            int coordX=0,coordY=0,demanda=0,codExt=0,tipoCentro=0;
+            while(scanner.hasNext()){
+                codExt=scanner.nextInt();
+                double x=scanner.nextDouble();
+                double y=scanner.nextDouble();
+                coordX=(int) x;
+                coordY= (int) y;
+                //System.out.println(coordY);
+                int a=scanner.nextInt();
+
+                demanda=scanner.nextInt();
+                if(clientes.size()<nclientes){
+                    Random rand = new Random();
+                    int tipo=rand.nextInt(nCentros); // asignamos aleatoriamente el tipo
+                    clientes.add(new Cliente(codExt,coordX,coordY,demanda,tipo));
+                }                           
+                else {
+                    centros.add(new Cliente(codExt,coordX,coordY,demanda,tipoCentro));
+                    tipoCentro++;
+                }
+                scanner.nextLine();
+
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Interface.class.getName()).log(Level.SEVERE, null, ex);
+        }        
+    }
     public void leerArchivo(){
         int n=0;
         try (Scanner scanner = new Scanner(new FileReader(text_clientes.getText()))) {
@@ -579,6 +630,7 @@ public class Interface extends javax.swing.JFrame {
                 if (scanner.hasNextInt() ) {
                     if(n==2) nclientes=scanner.nextInt();
                     else if(n==3) nCentros=scanner.nextInt();
+                    else if(n==5) capVehiculo=scanner.nextInt();
                     else scanner.nextInt();
                 } else {                   
                     scanner.next();
@@ -606,6 +658,17 @@ public class Interface extends javax.swing.JFrame {
                     }
                     else scanner.nextInt();
                 }
+//                else if (scanner.hasNextDouble()) {
+//                    //scanner.next();
+//                    if(n==1) {
+//                        coordX=(int) scanner.nextDouble();
+//                        System.out.println("coordX: "+coordX);
+//                    }
+//                    else if(n==2){
+//                        coordY=(int) scanner.nextDouble();
+//                        System.out.println("coordY: "+coordY);
+//                    }
+//                }
                 else scanner.next();
                 n++;
                 if(n==5){
